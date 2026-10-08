@@ -67,12 +67,12 @@ const socials: SocialLink[] = [
 
 <template>
   <div
-    class="min-h-screen bg-[#FBFBFA] font-sans text-[#1A1A1A] antialiased selection:bg-red-600 selection:text-white"
+    class="relative min-h-screen bg-[#FBFBFA] bg-[linear-gradient(to_right,rgba(17,17,17,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(17,17,17,0.035)_1px,transparent_1px)] bg-size-[32px_32px] font-sans text-[#111111] antialiased selection:bg-red-600 selection:text-white"
   >
-    <header class="sticky top-0 z-50 border-b border-zinc-200 bg-[#FBFBFA]/85 backdrop-blur-md">
+    <header class="sticky top-0 z-50 border-b border-zinc-200 bg-[#FBFBFA]/80 backdrop-blur-md">
       <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 md:h-20">
         <a href="#top" class="group relative inline-flex items-center">
-          <span class="font-mono text-sm font-medium tracking-[0.25em]">R.R.</span>
+          <span class="font-mono text-sm font-medium tracking-[0.3em]">R.R.</span>
           <span
             class="absolute -top-2.5 left-2 text-[10px] leading-none text-red-600 transition-transform duration-300 group-hover:-rotate-12"
           >
@@ -85,7 +85,7 @@ const socials: SocialLink[] = [
             v-for="item in nav"
             :key="item.href"
             :href="item.href"
-            class="group relative font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-[#1A1A1A]"
+            class="group relative font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-[#111111]"
           >
             {{ item.label }}
             <span
@@ -96,7 +96,7 @@ const socials: SocialLink[] = [
 
         <a
           href="#contact"
-          class="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-[#1A1A1A] md:hidden"
+          class="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-[#111111] md:hidden"
         >
           Контакты
         </a>
@@ -105,17 +105,25 @@ const socials: SocialLink[] = [
 
     <main>
       <section id="top" class="relative mx-auto max-w-6xl px-6 pt-16 pb-16 md:pt-28 md:pb-24">
+        <span class="absolute right-6 top-12 hidden text-sm leading-none text-red-600 md:block">
+          ✦
+        </span>
+
         <p class="-rotate-2 font-hand text-2xl text-red-600 md:ml-1 md:text-3xl">
           привет, я Рахым ✦
         </p>
 
         <h1
-          class="mt-6 text-[2.5rem] font-semibold uppercase leading-[0.95] tracking-tight sm:text-6xl md:text-7xl lg:text-[5.25rem]"
+          class="mt-6 text-[2.6rem] font-black uppercase leading-[0.88] tracking-tighter sm:text-6xl md:text-7xl lg:text-[5.5rem]"
         >
           Web&nbsp;Designer<br />
           &amp;&nbsp;Frontend<br />
           Developer
         </h1>
+
+        <p class="mt-4 -rotate-1 font-hand text-xl text-red-600 md:text-2xl">
+          с заботой о продукте
+        </p>
 
         <div class="mt-12 grid gap-8 border-t border-zinc-200 pt-8 md:grid-cols-12 md:pt-10">
           <p class="max-w-xl text-lg leading-relaxed text-zinc-600 md:col-span-7">
@@ -127,7 +135,7 @@ const socials: SocialLink[] = [
             <div
               class="inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.18em] text-zinc-500"
             >
-              <span class="h-1.5 w-1.5 rounded-full bg-red-600"></span>
+              <span class="text-[10px] leading-none text-red-600">✦</span>
               Алматы, Казахстан
             </div>
             <p class="mt-3 font-mono text-xs text-zinc-400">GMT+5 · открыт к проектам</p>
@@ -145,7 +153,7 @@ const socials: SocialLink[] = [
           <div class="mt-10 grid gap-12 md:grid-cols-12">
             <div class="md:col-span-8">
               <p
-                class="text-2xl font-light leading-snug sm:text-3xl md:text-[2.05rem] md:leading-[1.35]"
+                class="text-2xl font-light leading-snug sm:text-3xl md:text-[2.1rem] md:leading-[1.3]"
               >
                 Студент 3-го курса колледжа <span class="font-medium">МУИТ (IITU)</span> по
                 специальности Web&nbsp;Design. Проходил практику в типографии
@@ -161,8 +169,9 @@ const socials: SocialLink[] = [
             </div>
 
             <aside class="md:col-span-4 md:pt-4 md:text-right">
+              <span class="hidden font-mono text-[10px] leading-none text-red-600 md:block">✦</span>
               <p
-                class="-rotate-3 font-hand text-2xl leading-tight text-red-600 md:rotate-[-7deg] md:text-3xl"
+                class="mt-2 -rotate-3 font-hand text-2xl leading-tight text-red-600 md:rotate-[-7deg] md:text-3xl"
               >
                 дизайн и код —<br />в одних руках ✦
               </p>
@@ -173,9 +182,14 @@ const socials: SocialLink[] = [
 
       <section id="projects" class="scroll-mt-24 border-t border-zinc-200">
         <div class="mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div class="flex items-baseline gap-3 font-mono text-xs tracking-[0.18em]">
-            <span class="text-red-600">02</span>
-            <span class="uppercase text-zinc-400">// Избранные кейсы</span>
+          <div class="flex items-baseline justify-between gap-3">
+            <div class="flex items-baseline gap-3 font-mono text-xs tracking-[0.18em]">
+              <span class="text-red-600">02</span>
+              <span class="uppercase text-zinc-400">// Избранные кейсы</span>
+            </div>
+            <span class="hidden font-mono text-[11px] tracking-[0.18em] text-zinc-300 md:block">
+              2 проекта ✦
+            </span>
           </div>
 
           <div class="mt-12 grid gap-6 md:grid-cols-2">
@@ -185,27 +199,27 @@ const socials: SocialLink[] = [
               :href="project.href"
               target="_blank"
               rel="noopener"
-              class="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-zinc-200 bg-white/40 p-8 transition-all duration-500 hover:-translate-y-1 hover:border-zinc-300 hover:bg-white hover:shadow-[0_30px_60px_-45px_rgba(26,26,26,0.4)] md:p-10"
+              class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-200 bg-white/50 p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-zinc-300 hover:bg-white hover:shadow-[0_40px_80px_-55px_rgba(17,17,17,0.45)] md:p-10"
             >
+              <span
+                class="pointer-events-none absolute right-7 top-7 text-[10px] leading-none text-red-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              >
+                ✦
+              </span>
+
               <div class="flex items-start justify-between">
-                <span class="font-mono text-xs text-zinc-400">{{ project.index }}</span>
+                <span class="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
+                  {{ project.index }}
+                </span>
                 <span
-                  class="text-zinc-300 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-red-600"
+                  class="font-mono text-xl leading-none text-zinc-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-red-600"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    class="h-5 w-5"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M9 7h8v8" />
-                  </svg>
+                  →
                 </span>
               </div>
 
               <div class="mt-16">
-                <h3 class="text-3xl font-semibold tracking-tight md:text-4xl">
+                <h3 class="text-3xl font-black uppercase tracking-tighter md:text-4xl">
                   {{ project.title }}
                 </h3>
                 <p class="mt-4 max-w-md text-sm leading-relaxed text-zinc-600">
@@ -217,7 +231,7 @@ const socials: SocialLink[] = [
                 <span
                   v-for="tag in project.tags"
                   :key="tag"
-                  class="rounded-full border border-zinc-200 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-zinc-500"
+                  class="rounded-full border border-zinc-200 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-zinc-500 transition-colors duration-300 group-hover:border-zinc-300"
                 >
                   {{ tag }}
                 </span>
@@ -234,11 +248,11 @@ const socials: SocialLink[] = [
             <span class="uppercase text-zinc-400">// Технологии</span>
           </div>
 
-          <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+          <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-0">
             <div
               v-for="(group, index) in skills"
               :key="group.label"
-              :class="index > 0 ? 'md:border-l md:border-zinc-200 md:pl-8' : ''"
+              :class="index > 0 ? 'md:border-l md:border-zinc-200 md:pl-8' : 'md:pr-8'"
             >
               <h3 class="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
                 {{ group.label }}
@@ -249,7 +263,7 @@ const socials: SocialLink[] = [
                   :key="item"
                   class="flex items-center gap-3 text-lg"
                 >
-                  <span class="text-[11px] text-red-600">✦</span>
+                  <span class="text-[11px] leading-none text-red-600">✦</span>
                   <span>{{ item }}</span>
                 </li>
               </ul>
@@ -267,25 +281,23 @@ const socials: SocialLink[] = [
 
           <div class="mt-12 grid gap-12 md:grid-cols-12 md:items-end">
             <div class="md:col-span-8">
-              <h2 class="text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
+              <h2
+                class="text-4xl font-black uppercase leading-[0.95] tracking-tighter sm:text-5xl md:text-6xl"
+              >
                 Давайте создадим<br />что-то <span class="text-red-600">значимое</span>.
               </h2>
 
               <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
                 <a
                   href="mailto:hello@rahym.dev"
-                  class="group inline-flex items-center gap-3 rounded-full bg-[#1A1A1A] px-7 py-3.5 text-sm text-white transition-colors duration-300 hover:bg-red-600"
+                  class="group inline-flex items-center gap-3 rounded-full bg-[#111111] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-white transition-colors duration-300 hover:bg-red-600"
                 >
                   Написать письмо
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                  <span
+                    class="leading-none transition-transform duration-300 group-hover:translate-x-1"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6" />
-                  </svg>
+                    →
+                  </span>
                 </a>
 
                 <p class="-rotate-3 font-hand text-2xl text-red-600 md:text-3xl">напиши мне! ✦</p>
@@ -298,13 +310,13 @@ const socials: SocialLink[] = [
                   :href="social.href"
                   target="_blank"
                   rel="noopener"
-                  class="group flex items-center gap-3 py-4 font-mono text-sm uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:text-[#1A1A1A] md:justify-end"
+                  class="group flex items-center gap-3 py-4 font-mono text-sm uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:text-[#111111] md:justify-end"
                 >
                   <span>{{ social.label }}</span>
                   <span
-                    class="text-zinc-300 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-red-600"
+                    class="leading-none text-zinc-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-red-600"
                   >
-                    ↗
+                    →
                   </span>
                 </a>
               </li>
@@ -326,5 +338,13 @@ const socials: SocialLink[] = [
 </template>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@font-face {
+  font-family: 'Disruptors Script';
+  src: url('../assets/fonts/DisruptorsScript-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 </style>
