@@ -336,12 +336,10 @@ body { background: var(--paper); }
 .ink-trail { position: absolute; z-index: 0; right: -55px; top: 20px; width: min(38vw, 520px); height: auto; overflow: visible; pointer-events: none; opacity: .75; }
 .ink-trail path { fill: none; stroke: #d71032; stroke-width: 13; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 0; filter: drop-shadow(3px 4px 0 rgba(0,0,0,.55)); }
 .ink-trail.light path { stroke: #f3d9d5; }
-.motion-enabled .ink-trail path { stroke-dashoffset: 100; transition: stroke-dashoffset 1150ms cubic-bezier(.23, 1, .32, 1) 120ms; }
-.motion-enabled .ink-trail.is-visible path { stroke-dashoffset: 0; }
+.motion-enabled .ink-trail path { stroke-dashoffset: 100; }
 .ink-trail circle { fill: #d71032; opacity: .55; }
 .ink-trail.light circle { fill: #f3d9d5; }
-.motion-enabled .ink-trail circle { opacity: 0; transition: opacity 400ms ease-out 750ms; }
-.motion-enabled .ink-trail.is-visible circle { opacity: .55; }
+.motion-enabled .ink-trail circle { opacity: 0; }
 
 .float-section { position: relative; isolation: isolate; }
 .float-section > :not(.float-mark) { position: relative; z-index: 1; }
@@ -349,6 +347,10 @@ body { background: var(--paper); }
 .float-mark.star { font: 210px/1 Georgia, serif; }
 .float-mark.year { top: 4px; right: 3%; font: italic 900 clamp(84px, 11vw, 160px)/1 Georgia, serif; letter-spacing: -.1em; opacity: .1; }
 .float-mark.thorn { top: 15px; right: 6%; font: 180px/1 Georgia, serif; -webkit-text-stroke: 3px var(--red-raw); color: transparent; opacity: .16; }
+.float-mark-left { left: 2%; right: auto; top: 0; }
+.float-mark.year.float-mark-left { left: 1%; right: auto; }
+.contact-section .float-mark { color: var(--paper); -webkit-text-stroke-color: var(--paper); opacity: .2; }
+@media (min-width: 761px) { .float-mark { opacity: .21; } .float-mark.year { opacity: .17; } .float-mark.thorn { opacity: .23; } }
 
 .case-art { overflow: hidden; transition: transform 450ms cubic-bezier(.23, 1, .32, 1), box-shadow 450ms cubic-bezier(.23, 1, .32, 1); }
 .case-art:before { content: ''; position: absolute; z-index: 1; inset: 0; background: rgba(189,12,40,.25); opacity: 0; transform: scale(1.1); transition: opacity 300ms cubic-bezier(.23, 1, .32, 1), transform 450ms cubic-bezier(.23, 1, .32, 1); pointer-events: none; }

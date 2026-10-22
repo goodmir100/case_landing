@@ -14,13 +14,13 @@ export function createPortfolioMotion(root: HTMLElement) {
   const cursorCore = root.querySelector<HTMLElement>('.motion-cursor-core')
   const toggle = root.querySelector<HTMLButtonElement>('.motion-toggle')
   const progressBar = root.querySelector<HTMLElement>('.motion-progress')
-  const storageKey = 'case-portfolio-motion'
+  const storageKey = 'case-portfolio-motion-v2'
   let preference: 'auto' | 'on' | 'off' = 'auto'
   try {
     const saved = localStorage.getItem(storageKey)
     if (saved === 'on' || saved === 'off') preference = saved
-  } catch { /* The system preference still works when storage is unavailable. */ }
-  const enabled = () => preference === 'on' || (preference === 'auto' && !reduced.matches)
+  } catch { /* Motion still works when storage is unavailable. */ }
+  const enabled = () => preference !== 'off'
   let observer: IntersectionObserver | undefined
   let frame = 0
   let cursorFrame = 0
@@ -35,7 +35,7 @@ export function createPortfolioMotion(root: HTMLElement) {
     const active = enabled()
     root.classList.add('motion-controls-ready')
     root.classList.toggle('motion-enabled', active)
-    document.documentElement.classList.toggle('motion-user-on', preference === 'on')
+    document.documentElement.classList.toggle('motion-user-on', active)
     toggle?.setAttribute('aria-pressed', String(active))
     toggle?.setAttribute('aria-label', active ? 'Выключить анимацию' : 'Включить анимацию')
     const state = toggle?.querySelector<HTMLElement>('.motion-toggle-state')
@@ -60,6 +60,10 @@ export function createPortfolioMotion(root: HTMLElement) {
         element.classList.remove('motion-reveal', 'is-visible', 'motion-section', 'hero-past', 'hero-entered', 'motion-title', 'motion-card', 'motion-script', 'motion-row', 'motion-small')
       })
       root.querySelectorAll<HTMLElement>('.collage-star, .collage-date, .film-grain, .float-mark').forEach(element => element.style.removeProperty('transform'))
+      root.querySelectorAll<SVGElement>('.ink-trail path, .ink-trail circle').forEach(element => {
+        element.style.removeProperty('stroke-dashoffset')
+        element.style.removeProperty('opacity')
+      })
       progressBar?.style.removeProperty('transform')
       return
     }
@@ -95,10 +99,6 @@ export function createPortfolioMotion(root: HTMLElement) {
         observer?.observe(element)
       }
     })
-    root.querySelectorAll<HTMLElement>('.ink-trail').forEach(element => {
-      element.classList.add('motion-section')
-      observer?.observe(element)
-    })
     const hero = root.querySelector<HTMLElement>('.hero')
     if (hero && !hero.classList.contains('hero-entered')) {
       heroFrame = requestAnimationFrame(() => {
@@ -130,7 +130,19 @@ export function createPortfolioMotion(root: HTMLElement) {
       const rect = mark.parentElement?.getBoundingClientRect()
       if (!rect || rect.bottom < -100 || rect.top > innerHeight + 100) return
       const progress = Math.max(-1, Math.min(1, (innerHeight * 0.5 - rect.top - rect.height * 0.5) / innerHeight))
-      mark.style.transform = `translate3d(0, ${progress * 30}px, 0) rotate(${progress * 8}deg)`
+      mark.style.transform = `translate3d(0, ${progress * 80}px, 0) rotate(${progress * 18}deg)`
+    })
+    root.querySelectorAll<SVGSVGElement>('.ink-trail').forEach(trail => {
+      const section = trail.parentElement
+      if (!section) return
+      const rect = section.getBoundingClientRect()
+      if (rect.bottom < 0 || rect.top > innerHeight) return
+      const reveal = Math.max(0, Math.min(1, (innerHeight * .82 - rect.top) / (innerHeight * .78)))
+      const path = trail.querySelector<SVGPathElement>('path')
+      if (path) path.style.strokeDashoffset = String(100 * (1 - reveal))
+      trail.querySelectorAll<SVGCircleElement>('circle').forEach(circle => {
+        circle.style.opacity = String(Math.min(.55, Math.max(0, (reveal - .7) * 1.85)))
+      })
     })
   }
 
