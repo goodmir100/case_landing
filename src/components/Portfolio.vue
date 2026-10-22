@@ -67,6 +67,8 @@ onUnmounted(() => {
 
 <template>
   <div ref="site" class="site">
+    <div class="motion-progress" aria-hidden="true"></div>
+    <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Включить анимацию"><span aria-hidden="true">✳</span><span>Анимация</span><strong class="motion-toggle-state">Выкл</strong></button>
     <div class="motion-cursor" aria-hidden="true"><span>✳</span></div><div class="motion-cursor-core" aria-hidden="true"></div>
     <header class="header"><div class="wrap header-inner"><a class="logo" href="#/" aria-label="Главная">brand<span>✳</span>marketing</a><span class="header-era" aria-hidden="true">EST. IN IDEAS / 00s ENERGY</span><nav aria-label="Основная навигация"><a href="#/services">Услуги</a><a href="#/cases">Кейсы</a><a href="#/design">Дизайн</a><a href="#/about">Обо мне</a></nav><a class="header-link" href="#/contact">Обсудить проект ↗</a></div></header>
 
