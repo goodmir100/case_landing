@@ -1,350 +1,93 @@
 <script setup lang="ts">
-interface Project {
-  index: string
-  title: string
-  description: string
-  tags: string[]
-  href: string
-}
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-interface SkillGroup {
-  label: string
-  items: string[]
-}
+type Service = { title: string; need: string; scope: string; result: string }
+type Case = { slug: string; title: string; category: string; tags: string; summary: string; result: string; research: string; solution: string; work: string }
 
-interface SocialLink {
-  label: string
-  href: string
-}
-
-const nav = [
-  { label: 'Бэкграунд', href: '#about' },
-  { label: 'Кейсы', href: '#projects' },
-  { label: 'Технологии', href: '#skills' },
-  { label: 'Контакты', href: '#contact' },
+const services: Service[] = [
+  { title: 'Бренд-стратегия', need: 'Выделиться среди конкурентов и сформировать причину выбора.', scope: 'Исследование аудитории и конкурентов, позиционирование, платформа бренда, коммуникационная стратегия.', result: 'Чёткое позиционирование и основа для дальнейшего маркетинга.' },
+  { title: 'Запуск бренда с нуля', need: 'Вывести новый продукт на рынок и привлечь первых клиентов.', scope: 'Исследование рынка, проверка гипотез, позиционирование, стратегия запуска и план продвижения.', result: 'Подготовленный бренд и пошаговый план выхода на рынок.' },
+  { title: 'Маркетинг полного цикла', need: 'Выстроить системное продвижение и развитие бизнеса.', scope: 'Аудит, стратегия, выбор каналов, маркетинговый план, координация реализации и аналитика.', result: 'Управляемая система продвижения с целями и KPI.' },
+  { title: 'SMM и контент-продакшн', need: 'Повышать узнаваемость и получать обращения через социальные сети.', scope: 'SMM-стратегия, контент-план, сценарии, ТЗ, съёмка, организация продакшна, публикации и аналитика.', result: 'Системное продвижение и готовый фото- и видеоконтент.' },
+  { title: 'Графический дизайн', need: 'Создать визуальные материалы для рекламы, digital и печати.', scope: 'Рекламные креативы, полиграфия, журнальная вёрстка, адаптация форматов и предпечатная подготовка.', result: 'Готовые макеты для согласованных носителей и площадок.' },
 ]
-
-const projects: Project[] = [
-  {
-    index: '01',
-    title: 'TaskFlow',
-    description:
-      'SPA-сервис для эффективного управления задачами: интеграция с REST API, реактивные кастомные фильтры и строгая архитектура хранения данных.',
-    tags: ['Vue 3', 'Pinia', 'REST API'],
-    href: 'https://github.com/rahym',
-  },
-  {
-    index: '02',
-    title: 'People Desk',
-    description:
-      'Корпоративный инструмент мониторинга и сквозной фильтрации контактов сотрудников организации.',
-    tags: ['TypeScript', 'Vue 3', 'UI/UX'],
-    href: 'https://github.com/rahym',
-  },
+const cases: Case[] = [
+  { slug: 'a-prokat', title: 'А-ПРОКАТ', category: 'Контент', tags: 'SMM · КОНТЕНТ · ПРОДАКШН', summary: 'Как контент и короткие видео помогли увеличить аудиторию в 4 раза.', result: '300 → 1 200 подписчиков', research: 'Анализ аудитории и подходящих форматов контента.', solution: 'Ставка на понятный контент и короткие видео.', work: 'Контент-план, сценарии и производство публикаций.' },
+  { slug: 'zhemchuzhina-kamy', title: 'Жемчужина Камы', category: 'Маркетинг', tags: 'МАРКЕТИНГ · ДЕВЕЛОПМЕНТ', summary: 'Продвижение премиальной недвижимости с фокусом на качественные обращения и продажи.', result: '3 продажи с рекламы', research: 'Изучение продукта, аудитории и пути выбора недвижимости.', solution: 'Коммуникация ценности проекта через релевантные каналы.', work: 'Рекламные материалы и координация продвижения.' },
+  { slug: 'nastroenie', title: 'Настроение', category: 'Стратегия', tags: 'БРЕНД-СТРАТЕГИЯ · B2B', summary: 'Исследования клиентов и рынка для позиционирования производителя наружной рекламы.', result: 'Исследования · JTBD · бренд-платформа', research: 'Исследования клиентов, задач выбора и конкурентной среды.', solution: 'Платформа бренда на основе выявленных потребностей.', work: 'Позиционирование и коммуникационные ориентиры.' },
+  { slug: 'talan', title: 'Талан', category: 'Контент', tags: 'B2B · КОНТЕНТ · ПРОДВИЖЕНИЕ', summary: 'Развитие коммуникаций с подрядчиками и поставщиками через контент и digital.', result: '+108% подписчиков ВК за сентябрь 2026', research: 'Анализ интересов подрядчиков и поставщиков.', solution: 'Контент, который отвечает на вопросы аудитории.', work: 'Контент-план и digital-продвижение.' },
 ]
-
-const skills: SkillGroup[] = [
-  {
-    label: 'Design',
-    items: ['Figma (Adv.)', 'UI/UX Design', 'Дизайн-системы', 'Прототипирование'],
-  },
-  {
-    label: 'Frontend',
-    items: ['Vue 3', 'React', 'TypeScript', 'Tailwind CSS'],
-  },
-  {
-    label: 'Workflow',
-    items: ['Git / GitHub', 'VS Code', 'REST API', 'Performance'],
-  },
+const tasks = [
+  ['Запускаете новый продукт или бренд?', 'Помогу определить аудиторию, сформировать позиционирование и подготовить стратегию выхода на рынок.'],
+  ['Клиенты не понимают, почему выбрать вас?', 'Найду конкурентные преимущества и помогу донести ценность продукта через бренд и коммуникации.'],
+  ['Маркетинг есть, а системы нет?', 'Проведу аудит, определю приоритетные каналы и выстрою продвижение с целями и показателями.'],
+  ['Социальные сети не приводят нужную аудиторию?', 'Разработаю контент-стратегию, сценарии, организую съёмки и помогу сделать контент инструментом продвижения.'],
 ]
-
-const socials: SocialLink[] = [
-  { label: 'GitHub', href: 'https://github.com/rahym' },
-  { label: 'Telegram', href: 'https://t.me/rahym' },
-  { label: 'Email', href: 'mailto:hello@rahym.dev' },
+const process = [
+  ['Знакомство и брифинг', 'Обсуждаем продукт, задачи, текущий маркетинг, бюджет и ожидаемый результат.', 'Согласованные цели и объём работ.'],
+  ['Анализ и исследование', 'Изучаю рынок, конкурентов, аудиторию и существующие каналы.', 'Выводы и точки роста.'],
+  ['Разработка стратегии', 'Определяю позиционирование, сообщения, каналы и план действий.', 'Стратегия с приоритетами и KPI.'],
+  ['Реализация', 'Создаю контент, ТЗ, организую съёмки и координирую работы.', 'Запущенные активности.'],
+  ['Аналитика и развитие', 'Отслеживаю показатели, оцениваю эффективность и предлагаю шаги.', 'Отчёт и рекомендации.'],
 ]
+const faq = [
+  ['Можно обратиться, если у бизнеса ещё нет маркетинговой стратегии?', 'Да. Начнём с продукта, задач и аудитории, затем определим приоритеты.'],
+  ['Можно заказать только SMM или съёмку контента?', 'Да. Можно обсудить отдельную задачу без комплексного сопровождения.'],
+  ['Работаете с B2B и B2C?', 'Да. Подход и каналы подбираются под продукт и аудиторию.'],
+  ['Как формируется стоимость?', 'После знакомства и уточнения объёма работ подготовлю предложение.'],
+  ['Как оценивается эффективность?', 'На старте согласуем цели и показатели, затем будем отслеживать результаты.'],
+]
+const hash = ref(location.hash || '#/')
+const route = computed(() => hash.value.slice(1) || '/')
+const activeCase = computed(() => cases.find(c => route.value === `/cases/${c.slug}`))
+const filter = ref('Все')
+const categories = ['Все', 'Стратегия', 'Маркетинг', 'Контент']
+const visibleCases = computed(() => filter.value === 'Все' ? cases : cases.filter(c => c.category === filter.value))
+const expanded = ref<number | null>(null)
+const form = ref({ name: '', contact: '', task: '' })
+const notice = ref('')
+function updateRoute() { hash.value = location.hash || '#/'; scrollTo(0, 0) }
+function submit() { notice.value = 'Обращение подготовлено. Отправка станет доступна после подключения канала связи.' }
+onMounted(() => addEventListener('hashchange', updateRoute))
+onUnmounted(() => removeEventListener('hashchange', updateRoute))
 </script>
 
 <template>
-  <div
-    class="relative min-h-screen bg-[#FBFBFA] bg-[linear-gradient(to_right,rgba(17,17,17,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(17,17,17,0.035)_1px,transparent_1px)] bg-size-[32px_32px] font-sans text-[#111111] antialiased selection:bg-red-600 selection:text-white"
-  >
-    <header class="sticky top-0 z-50 border-b border-zinc-200 bg-[#FBFBFA]/80 backdrop-blur-md">
-      <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 md:h-20">
-        <a href="#top" class="group relative inline-flex items-center">
-          <span class="font-mono text-sm font-medium tracking-[0.3em]">R.R.</span>
-          <span
-            class="absolute -top-2.5 left-2 text-[10px] leading-none text-red-600 transition-transform duration-300 group-hover:-rotate-12"
-          >
-            ✦
-          </span>
-        </a>
+  <div class="site">
+    <header class="header"><div class="wrap header-inner"><a class="logo" href="#/" aria-label="Главная">brand<span>.</span>marketing</a><nav aria-label="Основная навигация"><a href="#/services">Услуги</a><a href="#/cases">Кейсы</a><a href="#/design">Дизайн</a><a href="#/about">Обо мне</a></nav><a class="header-link" href="#/contact">Обсудить проект ↗</a></div></header>
 
-        <nav class="hidden items-center gap-8 md:flex">
-          <a
-            v-for="item in nav"
-            :key="item.href"
-            :href="item.href"
-            class="group relative font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-[#111111]"
-          >
-            {{ item.label }}
-            <span
-              class="absolute -bottom-1 left-0 h-px w-0 bg-red-600 transition-all duration-300 group-hover:w-full"
-            ></span>
-          </a>
-        </nav>
+    <main v-if="route === '/'">
+      <section class="hero wrap"><div class="hero-copy"><p class="eyebrow">Бренд-маркетолог · стратегия и реализация</p><h1>Маркетинг<br />с <em>понятной</em><br />целью<span class="dot">.</span></h1><p class="lead">Помогаю новым брендам выходить на рынок, а действующим компаниям привлекать клиентов и увеличивать продажи.</p><p class="muted">Исследую рынок и аудиторию, разрабатываю позиционирование, маркетинговые стратегии и реализую продвижение.</p><div class="actions"><a class="button dark" href="#/cases">Смотреть кейсы ↗</a><a class="button outline" href="#/contact">Обсудить проект ↗</a></div></div><div class="portrait" role="img" aria-label="Место для профессионального портрета"><span>Ваш профессиональный портрет</span><b>От идеи<br />к результату</b></div><div class="hero-foot"><span>Исследование → стратегия → креатив → реализация → аналитика</span><span>01 / 12</span></div></section>
 
-        <a
-          href="#contact"
-          class="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-[#111111] md:hidden"
-        >
-          Контакты
-        </a>
-      </div>
-    </header>
+      <section class="section ink"><div class="wrap"><p class="eyebrow pink">Результаты</p><h2>Маркетинг, за которым<br />стоят результаты<span class="dot">.</span></h2><div class="metrics"><a href="#/cases/a-prokat"><strong>×4</strong><span>Рост аудитории<br />А-ПРОКАТ</span><b>↗</b></a><a href="#/cases/zhemchuzhina-kamy"><strong>3</strong><span>Продажи с рекламы<br />Жемчужина Камы</span><b>↗</b></a><a href="#/cases/talan"><strong>+108%</strong><span>Рост подписчиков ВК<br />Талан · сентябрь 2026</span><b>↗</b></a></div><p class="note">Показатели из брифа. Перед публикацией требуется сверка с отчётами и подтверждение личного вклада.</p></div></section>
 
-    <main>
-      <section id="top" class="relative mx-auto max-w-6xl px-6 pt-16 pb-16 md:pt-28 md:pb-24">
-        <span class="absolute right-6 top-12 hidden text-sm leading-none text-red-600 md:block">
-          ✦
-        </span>
+      <section class="section wrap"><p class="eyebrow">Задачи</p><h2>Решаю маркетинговые<br />задачи бизнеса<span class="dot">.</span></h2><div class="task-grid"><article v-for="(item,i) in tasks" :key="item[0]"><span>0{{ i+1 }}</span><h3>{{ item[0] }}</h3><p>{{ item[1] }}</p></article></div></section>
 
-        <p class="-rotate-2 font-hand text-2xl text-red-600 md:ml-1 md:text-3xl">
-          привет, я Рахым ✦
-        </p>
+      <section class="section pale"><div class="wrap"><p class="eyebrow">Услуги</p><h2>От исследования<br />до реализации<span class="dot">.</span></h2><p class="section-lead">Подбираю маркетинговые решения под задачи бизнеса. Можно начать с отдельной стратегии или выстроить комплексное продвижение.</p><div class="services"><article v-for="(item,i) in services" :key="item.title"><button type="button" :aria-expanded="expanded === i" @click="expanded = expanded === i ? null : i"><span>0{{ i+1 }}</span><strong>{{ item.title }}</strong><small>{{ item.need }}<br />Результат: {{ item.result }}</small><b>{{ expanded === i ? '−' : '+' }}</b></button><div v-if="expanded === i" class="service-open"><p>{{ item.scope }}</p><a href="#/contact">Обсудить услугу ↗</a></div></article></div><a class="text-link" href="#/services">Все услуги и форматы работы ↗</a></div></section>
 
-        <h1
-          class="mt-6 text-[2.6rem] font-black uppercase leading-[0.88] tracking-tighter sm:text-6xl md:text-7xl lg:text-[5.5rem]"
-        >
-          Web&nbsp;Designer<br />
-          &amp;&nbsp;Frontend<br />
-          Developer
-        </h1>
+      <section class="section wrap"><div class="heading-row"><div><p class="eyebrow">Избранные проекты</p><h2>Проекты, в которых<br />маркетинг решает задачи<span class="dot">.</span></h2></div><a class="text-link" href="#/cases">Все кейсы ↗</a></div><div class="case-grid"><a v-for="(item,i) in cases" :key="item.slug" class="case-card" :href="`#/cases/${item.slug}`"><div class="case-art" :class="`art-${i+1}`">{{ item.title }}</div><small>{{ item.tags }}</small><h3>{{ item.title }}</h3><p>{{ item.summary }}</p><div><b>{{ item.result }}</b><span>Подробнее ↗</span></div></a></div><p class="note light-note">Визуальные блоки обозначают места для реальных материалов проектов.</p></section>
 
-        <p class="mt-4 -rotate-1 font-hand text-xl text-red-600 md:text-2xl">
-          с заботой о продукте
-        </p>
+      <section class="section ink"><div class="wrap approach"><div><p class="eyebrow pink">Подход</p><h2>Сначала разбираюсь<br />в бизнесе. Потом<br /><em>предлагаю решения.</em></h2><p>Изучаю продукт, рынок, конкурентов и поведение покупателей, чтобы принимать решения на основе данных.</p></div><ol><li v-for="(item,i) in [['Исследования','Кто покупает, почему выбирает и что мешает покупке.'],['Стратегия','Как выделить бренд и достичь целей.'],['Реализация','Коммуникации, контент и рекламные материалы.'],['Аналитика','Оценка результатов и корректировка продвижения.']]" :key="item[0]"><span>0{{ i+1 }}</span><div><strong>{{ item[0] }}</strong><p>{{ item[1] }}</p></div></li></ol></div></section>
 
-        <div class="mt-12 grid gap-8 border-t border-zinc-200 pt-8 md:grid-cols-12 md:pt-10">
-          <p class="max-w-xl text-lg leading-relaxed text-zinc-600 md:col-span-7">
-            Универсальный специалист: проектирую UI/UX-системы в Figma и превращаю их в быстрый,
-            адаптивный и поддерживаемый код на Vue и React.
-          </p>
+      <section class="section wrap"><p class="eyebrow">Процесс</p><h2>Понятный путь<br />от задачи до результата<span class="dot">.</span></h2><div class="process"><article v-for="(item,i) in process" :key="item[0]"><span>0{{ i+1 }}</span><h3>{{ item[0] }}</h3><p>{{ item[1] }}</p><small>Итог: {{ item[2] }}</small></article></div><p class="note light-note">Не каждый проект проходит все этапы: можно заказать отдельную стратегию или производство контента.</p></section>
 
-          <div class="md:col-span-5 md:justify-self-end md:text-right">
-            <div
-              class="inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.18em] text-zinc-500"
-            >
-              <span class="text-[10px] leading-none text-red-600">✦</span>
-              Алматы, Казахстан
-            </div>
-            <p class="mt-3 font-mono text-xs text-zinc-400">GMT+5 · открыт к проектам</p>
-          </div>
-        </div>
-      </section>
+      <section class="section pink-bg"><div class="wrap design-teaser"><div><p class="eyebrow">Дизайн-портфолио</p><h2>Дизайн, который<br />поддерживает идею бренда.</h2><p>Визуальные материалы для digital и печати с учётом коммуникации, носителя и требований производства.</p><a class="button dark" href="#/design">Смотреть дизайн-портфолио ↗</a></div><div class="design-types"><article><span>01</span><h3>Print & Editorial</h3><p>Полиграфия, журнальная вёрстка, рекламные материалы.</p></article><article><span>02</span><h3>Digital Design</h3><p>Креативы, баннеры, визуальные системы и адаптации.</p></article></div></div></section>
 
-      <section id="about" class="scroll-mt-24 border-t border-zinc-200">
-        <div class="mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div class="flex items-baseline gap-3 font-mono text-xs tracking-[0.18em]">
-            <span class="text-red-600">01</span>
-            <span class="uppercase text-zinc-400">// Бэкграунд</span>
-          </div>
+      <section class="section wrap about-teaser"><div class="about-art">S<span>↗</span></div><div><p class="eyebrow">Обо мне</p><h2>Стратегическое мышление.<br />Креативная реализация<span class="dot">.</span></h2><p>Я бренд-маркетолог. Работаю на пересечении исследований, стратегии, контента и дизайна. Могу разработать стратегию и участвовать в её реализации.</p><a class="text-link" href="#/about">Подробнее обо мне ↗</a></div></section>
 
-          <div class="mt-10 grid gap-12 md:grid-cols-12">
-            <div class="md:col-span-8">
-              <p
-                class="text-2xl font-light leading-snug sm:text-3xl md:text-[2.1rem] md:leading-[1.3]"
-              >
-                Студент 3-го курса колледжа <span class="font-medium">МУИТ (IITU)</span> по
-                специальности Web&nbsp;Design. Проходил практику в типографии
-                <span class="font-medium">DNPrint</span>, где занимался точным переносом сложных
-                UI-макетов из Figma в оптимизированный адаптивный код.
-              </p>
+      <section class="section pale"><div class="wrap"><p class="eyebrow">Сотрудничество</p><h2>Подключаюсь<br />на нужном этапе<span class="dot">.</span></h2><div class="formats"><article v-for="(item,i) in [['Разовая стратегическая задача','Исследование, аудит, позиционирование или стратегия с планом действий.'],['Проектное сопровождение','Запуск бренда, кампания или контентный проект.'],['Долгосрочное сотрудничество','Системное сопровождение, развитие каналов и аналитика.']]" :key="item[0]"><span>0{{ i+1 }}</span><h3>{{ item[0] }}</h3><p>{{ item[1] }}</p></article></div></div></section>
 
-              <p class="mt-8 max-w-2xl text-base leading-relaxed text-zinc-600">
-                Моя сила — универсальность: держу в голове и художественную, и инженерную часть.
-                Проектирую интерфейсы с упором на производительность и минимизацию издержек — от
-                первой сетки в Figma до финальной сборки.
-              </p>
-            </div>
-
-            <aside class="md:col-span-4 md:pt-4 md:text-right">
-              <span class="hidden font-mono text-[10px] leading-none text-red-600 md:block">✦</span>
-              <p
-                class="mt-2 -rotate-3 font-hand text-2xl leading-tight text-red-600 md:rotate-[-7deg] md:text-3xl"
-              >
-                дизайн и код —<br />в одних руках ✦
-              </p>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      <section id="projects" class="scroll-mt-24 border-t border-zinc-200">
-        <div class="mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div class="flex items-baseline justify-between gap-3">
-            <div class="flex items-baseline gap-3 font-mono text-xs tracking-[0.18em]">
-              <span class="text-red-600">02</span>
-              <span class="uppercase text-zinc-400">// Избранные кейсы</span>
-            </div>
-            <span class="hidden font-mono text-[11px] tracking-[0.18em] text-zinc-300 md:block">
-              2 проекта ✦
-            </span>
-          </div>
-
-          <div class="mt-12 grid gap-6 md:grid-cols-2">
-            <a
-              v-for="project in projects"
-              :key="project.title"
-              :href="project.href"
-              target="_blank"
-              rel="noopener"
-              class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-200 bg-white/50 p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-zinc-300 hover:bg-white hover:shadow-[0_40px_80px_-55px_rgba(17,17,17,0.45)] md:p-10"
-            >
-              <span
-                class="pointer-events-none absolute right-7 top-7 text-[10px] leading-none text-red-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-              >
-                ✦
-              </span>
-
-              <div class="flex items-start justify-between">
-                <span class="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
-                  {{ project.index }}
-                </span>
-                <span
-                  class="font-mono text-xl leading-none text-zinc-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-red-600"
-                >
-                  →
-                </span>
-              </div>
-
-              <div class="mt-16">
-                <h3 class="text-3xl font-black uppercase tracking-tighter md:text-4xl">
-                  {{ project.title }}
-                </h3>
-                <p class="mt-4 max-w-md text-sm leading-relaxed text-zinc-600">
-                  {{ project.description }}
-                </p>
-              </div>
-
-              <div class="mt-8 flex flex-wrap gap-2">
-                <span
-                  v-for="tag in project.tags"
-                  :key="tag"
-                  class="rounded-full border border-zinc-200 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-zinc-500 transition-colors duration-300 group-hover:border-zinc-300"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section id="skills" class="scroll-mt-24 border-t border-zinc-200">
-        <div class="mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div class="flex items-baseline gap-3 font-mono text-xs tracking-[0.18em]">
-            <span class="text-red-600">03</span>
-            <span class="uppercase text-zinc-400">// Технологии</span>
-          </div>
-
-          <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-0">
-            <div
-              v-for="(group, index) in skills"
-              :key="group.label"
-              :class="index > 0 ? 'md:border-l md:border-zinc-200 md:pl-8' : 'md:pr-8'"
-            >
-              <h3 class="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
-                {{ group.label }}
-              </h3>
-              <ul class="mt-6 space-y-3.5">
-                <li
-                  v-for="item in group.items"
-                  :key="item"
-                  class="flex items-center gap-3 text-lg"
-                >
-                  <span class="text-[11px] leading-none text-red-600">✦</span>
-                  <span>{{ item }}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" class="scroll-mt-24 border-t border-zinc-200">
-        <div class="mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div class="flex items-baseline gap-3 font-mono text-xs tracking-[0.18em]">
-            <span class="text-red-600">04</span>
-            <span class="uppercase text-zinc-400">// Контакты</span>
-          </div>
-
-          <div class="mt-12 grid gap-12 md:grid-cols-12 md:items-end">
-            <div class="md:col-span-8">
-              <h2
-                class="text-4xl font-black uppercase leading-[0.95] tracking-tighter sm:text-5xl md:text-6xl"
-              >
-                Давайте создадим<br />что-то <span class="text-red-600">значимое</span>.
-              </h2>
-
-              <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
-                <a
-                  href="mailto:hello@rahym.dev"
-                  class="group inline-flex items-center gap-3 rounded-full bg-[#111111] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-white transition-colors duration-300 hover:bg-red-600"
-                >
-                  Написать письмо
-                  <span
-                    class="leading-none transition-transform duration-300 group-hover:translate-x-1"
-                  >
-                    →
-                  </span>
-                </a>
-
-                <p class="-rotate-3 font-hand text-2xl text-red-600 md:text-3xl">напиши мне! ✦</p>
-              </div>
-            </div>
-
-            <ul class="divide-y divide-zinc-200 md:col-span-4 md:justify-self-end md:text-right">
-              <li v-for="social in socials" :key="social.label">
-                <a
-                  :href="social.href"
-                  target="_blank"
-                  rel="noopener"
-                  class="group flex items-center gap-3 py-4 font-mono text-sm uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:text-[#111111] md:justify-end"
-                >
-                  <span>{{ social.label }}</span>
-                  <span
-                    class="leading-none text-zinc-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-red-600"
-                  >
-                    →
-                  </span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
+      <section class="section wrap faq"><div><p class="eyebrow">Частые вопросы</p><h2>Коротко о работе<span class="dot">.</span></h2></div><div><details v-for="item in faq" :key="item[0]"><summary>{{ item[0] }} <span aria-hidden="true">+</span></summary><p>{{ item[1] }}</p></details></div></section>
+      <section class="contact-section"><div class="wrap contact-grid"><div><p class="eyebrow pink">Давайте знакомиться</p><p class="script">LET'S BUILD SOMETHING SPICY</p><h2>Есть задача<br />для маркетинга?<br /><em>Обсудим.</em></h2><p>Расскажите о бизнесе и цели. Помогу определить, с чего начать.</p></div><form @submit.prevent="submit"><label for="name">Ваше имя</label><input id="name" v-model="form.name" autocomplete="name" required /><label for="contact">Контакт для связи</label><input id="contact" v-model="form.contact" required /><label for="task">Расскажите о задаче</label><textarea id="task" v-model="form.task" rows="4" required></textarea><button class="button pink-button" type="submit">Подготовить обращение ↗</button><p v-if="notice" role="status">{{ notice }}</p><small>Форма демонстрационная. Отправка и обработка персональных данных подключаются перед публикацией.</small></form></div></section>
     </main>
 
-    <footer class="border-t border-zinc-200">
-      <div
-        class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-400 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <span>© 2026 Рахым · Алматы, Казахстан</span>
-        <span>Спроектировано и собрано вручную ✦</span>
-      </div>
-    </footer>
+    <main v-else-if="route === '/services'" class="inner wrap"><a class="back" href="#/">← Главная</a><p class="eyebrow">Направления работы</p><h1>От исследования<br />до реализации<span class="dot">.</span></h1><p class="page-lead">Пять направлений, которые можно заказать отдельно или объединить в комплексный проект.</p><div class="service-page"><article v-for="(item,i) in services" :key="item.title"><span>0{{ i+1 }}</span><div><h2>{{ item.title }}</h2><p>{{ item.need }}</p><h3>Что входит</h3><p>{{ item.scope }}</p><h3>Результат</h3><p>{{ item.result }}</p><a class="text-link" href="#/contact">Обсудить услугу ↗</a></div></article></div></main>
+    <main v-else-if="route === '/cases'" class="inner wrap"><a class="back" href="#/">← Главная</a><p class="eyebrow">Портфолио</p><h1>Кейсы<span class="dot">.</span></h1><p class="page-lead">Задачи, решения и результаты проектов.</p><div class="filters" aria-label="Фильтры кейсов"><button v-for="item in categories" :key="item" type="button" :class="{active:filter===item}" :aria-pressed="filter===item" @click="filter=item">{{ item }}</button></div><div class="case-grid"><a v-for="item in visibleCases" :key="item.slug" class="case-card" :href="`#/cases/${item.slug}`"><div class="case-art" :class="`art-${cases.indexOf(item)+1}`">{{ item.title }}</div><small>{{ item.tags }}</small><h2>{{ item.title }}</h2><p>{{ item.summary }}</p><div><b>{{ item.result }}</b><span>Подробнее ↗</span></div></a></div></main>
+    <main v-else-if="activeCase" class="inner wrap"><a class="back" href="#/cases">← Все кейсы</a><p class="eyebrow">{{ activeCase.tags }}</p><h1>{{ activeCase.title }}<span class="dot">.</span></h1><p class="page-lead">{{ activeCase.summary }}</p><div class="case-placeholder">Место для реальных материалов проекта</div><div class="story"><article v-for="(item,i) in [['Задача',activeCase.summary],['Исходная ситуация',activeCase.summary],['Исследование',activeCase.research],['Решение',activeCase.solution],['Реализация',activeCase.work],['Результат',activeCase.result],['Визуальные материалы','Скриншоты и макеты будут добавлены после согласования.']]" :key="item[0]"><span>0{{ i+1 }}</span><h2>{{ item[0] }}</h2><p>{{ item[1] }}</p></article></div><p class="note light-note">Описание составлено по брифу. Отчёты, период и личный вклад требуют подтверждения перед публикацией.</p><a class="button dark" href="#/contact">Обсудить похожую задачу ↗</a></main>
+    <main v-else-if="route === '/design'" class="inner wrap"><a class="back" href="#/">← Главная</a><p class="eyebrow">Дизайн-портфолио</p><h1>Дизайн для<br />задач бренда<span class="dot">.</span></h1><p class="page-lead">Работы будут добавлены после отбора и согласования.</p><div class="gallery"><article><div>Print & Editorial</div><h2>Print & Editorial</h2><p>Полиграфия, журнальная вёрстка, рекламные материалы и подготовка к печати.</p></article><article><div>Digital Design</div><h2>Digital Design</h2><p>Креативы, баннеры, визуальные системы и адаптации.</p></article></div></main>
+    <main v-else-if="route === '/about'" class="inner wrap"><a class="back" href="#/">← Главная</a><p class="eyebrow">Обо мне</p><h1>Стратегическое мышление.<br /><em>Креативная реализация.</em></h1><div class="about-page"><div>Место для профессионального портрета</div><article><p>Я бренд-маркетолог. Работаю на пересечении исследований, стратегии, контента и дизайна.</p><p>Мне важно понимать, как устроен бизнес, что влияет на выбор покупателей и какие решения нужны продукту. Поэтому я могу не только разработать стратегию, но и участвовать в её реализации: создавать концепции, сценарии, визуальные материалы и контент.</p><blockquote>У каждого маркетингового решения должна быть конкретная задача и понятный способ оценить результат.</blockquote><a class="button dark" href="#/contact">Обсудить проект ↗</a></article></div></main>
+    <main v-else-if="route === '/contact'" class="inner wrap"><a class="back" href="#/">← Главная</a><p class="eyebrow">Контакты</p><h1>Есть задача для маркетинга?<br /><em>Обсудим.</em></h1><p class="page-lead">Расскажите о бизнесе и цели. Помогу определить, с чего начать.</p><form class="contact-form" @submit.prevent="submit"><label for="name-page">Ваше имя</label><input id="name-page" v-model="form.name" autocomplete="name" required /><label for="contact-page">Контакт для связи</label><input id="contact-page" v-model="form.contact" required /><label for="task-page">Расскажите о задаче</label><textarea id="task-page" v-model="form.task" rows="4" required></textarea><button class="button dark" type="submit">Подготовить обращение ↗</button><p v-if="notice" role="status">{{ notice }}</p><small>Форма демонстрационная. Отправка и обработка персональных данных подключаются перед публикацией.</small></form></main>
+    <main v-else class="inner wrap"><h1>Страница не найдена.</h1><a class="button dark" href="#/">На главную ↗</a></main>
+    <footer class="footer"><div class="wrap"><a class="logo" href="#/">brand<span>.</span>marketing</a><p>Стратегия · креатив · реализация</p><a href="#/contact">Обсудить проект ↗</a></div></footer>
   </div>
 </template>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-@font-face {
-  font-family: 'Disruptors Script';
-  src: url('../assets/fonts/DisruptorsScript-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-</style>
