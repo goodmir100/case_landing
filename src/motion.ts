@@ -20,7 +20,7 @@ export function createPortfolioMotion(root: HTMLElement) {
     const saved = localStorage.getItem(storageKey)
     if (saved === 'on' || saved === 'off') preference = saved
   } catch { /* Motion still works when storage is unavailable. */ }
-  const enabled = () => preference !== 'off'
+  const enabled = () => preference === 'on' || (preference !== 'off' && !reduced.matches)
   let observer: IntersectionObserver | undefined
   let frame = 0
   let cursorFrame = 0
