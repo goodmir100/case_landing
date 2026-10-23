@@ -8,19 +8,10 @@ const revealSelector = [
 ].join(', ')
 
 export function createPortfolioMotion(root: HTMLElement) {
-  const finePointer = matchMedia('(hover: hover) and (pointer: fine)')
-  const cursor = root.querySelector<HTMLElement>('.motion-cursor')
-  const cursorCore = root.querySelector<HTMLElement>('.motion-cursor-core')
   const progressBar = root.querySelector<HTMLElement>('.motion-progress')
   let observer: IntersectionObserver | undefined
   let frame = 0
-  let cursorFrame = 0
   let heroFrame = 0
-  let targetX = -100
-  let targetY = -100
-  let currentX = -100
-  let currentY = -100
-  let cursorVisible = false
 
   function enableMotion() {
     root.classList.add('motion-enabled')
@@ -119,43 +110,7 @@ export function createPortfolioMotion(root: HTMLElement) {
     if (!frame) frame = requestAnimationFrame(updateParallax)
   }
 
-  function animateCursor() {
-    cursorFrame = 0
-    if (!cursor || !cursorCore || !cursorVisible) return
-    currentX += (targetX - currentX) * 0.19
-    currentY += (targetY - currentY) * 0.19
-    cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`
-    cursorCore.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`
-    if (Math.abs(targetX - currentX) + Math.abs(targetY - currentY) > 0.25) {
-      cursorFrame = requestAnimationFrame(animateCursor)
-    }
-  }
-
-  function onPointerMove(event: PointerEvent) {
-    if (!finePointer.matches || event.pointerType === 'touch') return
-    targetX = event.clientX
-    targetY = event.clientY
-    if (!cursorVisible) {
-      currentX = targetX
-      currentY = targetY
-      cursorVisible = true
-      root.classList.add('cursor-active')
-    }
-    const hover = (event.target as Element)?.closest('a, button, summary, .collage-print')
-    root.classList.toggle('cursor-hover', Boolean(hover))
-    if (!cursorFrame) cursorFrame = requestAnimationFrame(animateCursor)
-  }
-
-  function onPointerLeave() {
-    cursorVisible = false
-    root.classList.remove('cursor-active', 'cursor-hover')
-    cancelAnimationFrame(cursorFrame)
-    cursorFrame = 0
-  }
-
   addEventListener('scroll', onScroll, { passive: true })
-  addEventListener('pointermove', onPointerMove, { passive: true })
-  document.addEventListener('pointerleave', onPointerLeave)
   refresh()
 
   return {
@@ -163,11 +118,8 @@ export function createPortfolioMotion(root: HTMLElement) {
     destroy() {
       observer?.disconnect()
       cancelAnimationFrame(frame)
-      cancelAnimationFrame(cursorFrame)
       cancelAnimationFrame(heroFrame)
       removeEventListener('scroll', onScroll)
-      removeEventListener('pointermove', onPointerMove)
-      document.removeEventListener('pointerleave', onPointerLeave)
     },
   }
 }
