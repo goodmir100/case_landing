@@ -8,19 +8,10 @@ const revealSelector = [
 ].join(', ')
 
 export function createPortfolioMotion(root: HTMLElement) {
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)')
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)')
   const cursor = root.querySelector<HTMLElement>('.motion-cursor')
   const cursorCore = root.querySelector<HTMLElement>('.motion-cursor-core')
-  const toggle = root.querySelector<HTMLButtonElement>('.motion-toggle')
   const progressBar = root.querySelector<HTMLElement>('.motion-progress')
-  const storageKey = 'case-portfolio-motion-v2'
-  let preference: 'auto' | 'on' | 'off' = 'auto'
-  try {
-    const saved = localStorage.getItem(storageKey)
-    if (saved === 'on' || saved === 'off') preference = saved
-  } catch { /* Motion still works when storage is unavailable. */ }
-  const enabled = () => preference === 'on' || (preference !== 'off' && !reduced.matches)
   let observer: IntersectionObserver | undefined
   let frame = 0
   let cursorFrame = 0
@@ -31,15 +22,8 @@ export function createPortfolioMotion(root: HTMLElement) {
   let currentY = -100
   let cursorVisible = false
 
-  function updateToggle() {
-    const active = enabled()
-    root.classList.add('motion-controls-ready')
-    root.classList.toggle('motion-enabled', active)
-    document.documentElement.classList.toggle('motion-user-on', active)
-    toggle?.setAttribute('aria-pressed', String(active))
-    toggle?.setAttribute('aria-label', active ? 'Выключить анимацию' : 'Включить анимацию')
-    const state = toggle?.querySelector<HTMLElement>('.motion-toggle-state')
-    if (state) state.textContent = active ? 'Вкл' : 'Выкл'
+  function enableMotion() {
+    root.classList.add('motion-enabled')
   }
 
   function revealKind(element: HTMLElement) {
@@ -52,21 +36,7 @@ export function createPortfolioMotion(root: HTMLElement) {
 
   function refresh() {
     observer?.disconnect()
-    updateToggle()
-    if (!enabled()) {
-      cancelAnimationFrame(heroFrame)
-      onPointerLeave()
-      root.querySelectorAll<HTMLElement>('.motion-reveal, .motion-section, .hero').forEach(element => {
-        element.classList.remove('motion-reveal', 'is-visible', 'motion-section', 'hero-past', 'hero-entered', 'motion-title', 'motion-card', 'motion-script', 'motion-row', 'motion-small')
-      })
-      root.querySelectorAll<HTMLElement>('.collage-star, .collage-date, .film-grain, .float-mark').forEach(element => element.style.removeProperty('transform'))
-      root.querySelectorAll<SVGElement>('.ink-trail path, .ink-trail circle').forEach(element => {
-        element.style.removeProperty('stroke-dashoffset')
-        element.style.removeProperty('opacity')
-      })
-      progressBar?.style.removeProperty('transform')
-      return
-    }
+    enableMotion()
 
     const maskedTargets = new Map<Element, HTMLElement[]>()
     observer = new IntersectionObserver(entries => {
@@ -110,7 +80,6 @@ export function createPortfolioMotion(root: HTMLElement) {
 
   function updateParallax() {
     frame = 0
-    if (!enabled()) return
     if (progressBar) {
       const scrollRange = Math.max(1, document.documentElement.scrollHeight - innerHeight)
       progressBar.style.transform = `scaleX(${Math.min(1, scrollY / scrollRange)})`
@@ -147,7 +116,7 @@ export function createPortfolioMotion(root: HTMLElement) {
   }
 
   function onScroll() {
-    if (enabled() && !frame) frame = requestAnimationFrame(updateParallax)
+    if (!frame) frame = requestAnimationFrame(updateParallax)
   }
 
   function animateCursor() {
@@ -163,7 +132,7 @@ export function createPortfolioMotion(root: HTMLElement) {
   }
 
   function onPointerMove(event: PointerEvent) {
-    if (!enabled() || !finePointer.matches || event.pointerType === 'touch') return
+    if (!finePointer.matches || event.pointerType === 'touch') return
     targetX = event.clientX
     targetY = event.clientY
     if (!cursorVisible) {
@@ -184,23 +153,9 @@ export function createPortfolioMotion(root: HTMLElement) {
     cursorFrame = 0
   }
 
-  function onPreferenceChange() {
-    onPointerLeave()
-    refresh()
-  }
-
-  function onToggle() {
-    preference = enabled() ? 'off' : 'on'
-    try { localStorage.setItem(storageKey, preference) } catch { /* The toggle still works for this visit. */ }
-    refresh()
-  }
-
   addEventListener('scroll', onScroll, { passive: true })
   addEventListener('pointermove', onPointerMove, { passive: true })
   document.addEventListener('pointerleave', onPointerLeave)
-  reduced.addEventListener('change', onPreferenceChange)
-  finePointer.addEventListener('change', onPreferenceChange)
-  toggle?.addEventListener('click', onToggle)
   refresh()
 
   return {
@@ -213,10 +168,6 @@ export function createPortfolioMotion(root: HTMLElement) {
       removeEventListener('scroll', onScroll)
       removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerleave', onPointerLeave)
-      reduced.removeEventListener('change', onPreferenceChange)
-      finePointer.removeEventListener('change', onPreferenceChange)
-      toggle?.removeEventListener('click', onToggle)
-      document.documentElement.classList.remove('motion-user-on')
     },
   }
 }

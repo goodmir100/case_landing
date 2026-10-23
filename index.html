@@ -16,13 +16,33 @@
         display: grid;
         place-items: center;
         padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
-        background: #f2eee7;
+        overflow: hidden;
+        isolation: isolate;
+        background-color: #eee9df;
+        background-image: linear-gradient(rgba(70, 76, 77, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(70, 76, 77, .055) 1px, transparent 1px), linear-gradient(rgba(70, 76, 77, .09) 1px, transparent 1px), linear-gradient(90deg, rgba(70, 76, 77, .09) 1px, transparent 1px);
+        background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
+        animation: blueprint-paper 18s linear infinite;
         opacity: 1;
         transition: opacity 480ms ease;
       }
+      .preloader__drawing { position: absolute; inset: 0; width: 100%; height: 100%; color: #657174; pointer-events: none; }
+      .preloader__frame, .preloader__axis, .preloader__ring, .preloader__ticks { fill: none; stroke: currentColor; vector-effect: non-scaling-stroke; }
+      .preloader__frame { stroke-width: 1; opacity: .55; }
+      .preloader__axis { stroke-width: 1; stroke-dasharray: 3 8; opacity: .42; }
+      .preloader__ring { stroke-width: 1; stroke-dasharray: 2 10; transform-origin: 50% 50%; animation: blueprint-orbit 48s linear infinite; }
+      .preloader__ring.inner { stroke-dasharray: 1 7; animation-direction: reverse; animation-duration: 34s; }
+      .preloader__ticks { stroke-width: 2; opacity: .7; }
+      .preloader__scan { position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(229, 9, 20, .48), transparent); box-shadow: 0 0 18px rgba(229, 9, 20, .24); animation: blueprint-scan 4.8s cubic-bezier(.42, 0, .58, 1) infinite; pointer-events: none; }
+      .preloader__label { position: absolute; z-index: 2; color: #677174; font: 700 9px/1.5 Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+      .preloader__label.top-left { top: max(28px, env(safe-area-inset-top)); left: max(28px, env(safe-area-inset-left)); }
+      .preloader__label.top-right { top: max(28px, env(safe-area-inset-top)); right: max(28px, env(safe-area-inset-right)); text-align: right; }
+      .preloader__label.bottom-left { bottom: max(28px, env(safe-area-inset-bottom)); left: max(28px, env(safe-area-inset-left)); }
+      .preloader__label.bottom-right { bottom: max(28px, env(safe-area-inset-bottom)); right: max(28px, env(safe-area-inset-right)); text-align: right; }
       .preloader__mark {
+        position: relative;
+        z-index: 1;
         display: block;
-        width: min(82vw, 70vh, 560px);
+        width: min(58vw, 46vh, 360px);
         max-width: 100%;
         height: auto;
         aspect-ratio: 480 / 480;
@@ -41,34 +61,46 @@
       .preloader__stem { stroke-width: 13; animation: draw-ink 800ms cubic-bezier(.48, 0, .23, 1) 1100ms forwards; }
       .preloader__sweep { stroke-width: 13; animation: draw-ink 600ms cubic-bezier(.4, 0, .2, 1) 1900ms forwards; }
       .preloader__fill { fill: currentColor; opacity: 0; animation: reveal-ink 250ms ease 2500ms forwards; }
+      .preloader__progress { position: absolute; z-index: 2; left: 50%; bottom: max(32px, env(safe-area-inset-bottom)); width: min(180px, 36vw); height: 1px; overflow: hidden; background: rgba(70, 76, 77, .2); transform: translateX(-50%); }
+      .preloader__progress:after { content: ''; display: block; width: 42%; height: 100%; background: #e50914; animation: blueprint-progress 2.7s cubic-bezier(.4, 0, .2, 1) infinite; }
       .is-preloader-exiting .preloader { opacity: 0; pointer-events: none; }
       @keyframes draw-ink { to { stroke-dashoffset: 0; } }
       @keyframes reveal-ink { to { opacity: 1; } }
-      @media (prefers-reduced-motion: reduce) {
-        .preloader { transition: none; }
-        .preloader__line { animation: none; stroke-dashoffset: 0; }
-        .preloader__fill { animation: none; opacity: 1; }
-      }
+      @keyframes blueprint-paper { to { background-position: 24px 24px, 24px 24px, 120px 120px, 120px 120px; } }
+      @keyframes blueprint-orbit { to { transform: rotate(360deg); } }
+      @keyframes blueprint-scan { 0% { transform: translateY(-2vh); opacity: 0; } 15%, 80% { opacity: .8; } 100% { transform: translateY(102vh); opacity: 0; } }
+      @keyframes blueprint-progress { 0% { transform: translateX(-110%); } 100% { transform: translateX(350%); } }
+      @media (max-width: 600px) { .preloader__label { font-size: 8px; letter-spacing: .14em; } .preloader__mark { width: min(68vw, 36vh, 300px); } }
     </style>
     <noscript><style>.preloader { display: none; } html.is-preloading, html.is-preloading body { overflow: auto; } html.is-preloading #app { visibility: visible; }</style></noscript>
   </head>
   <body>
     <div class="preloader" id="preloader" role="status" aria-label="Загрузка сайта">
+      <svg class="preloader__drawing" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <g class="preloader__frame"><path d="M48 48h190M48 48v120M1392 48h-190M1392 48v120M48 852h190M48 852V732M1392 852h-190M1392 852V732" /><circle cx="720" cy="450" r="350" /><circle class="preloader__ring inner" cx="720" cy="450" r="285" /></g>
+        <path class="preloader__axis" d="M720 48v804M48 450h1344M180 450h1080M720 100v700" />
+        <g class="preloader__ticks"><path d="M720 80v18M720 802v18M350 450h18M1072 450h18M458 188l13 13M969 699l13 13M982 188l-13 13M471 699l-13 13" /></g>
+      </svg>
+      <span class="preloader__scan" aria-hidden="true"></span>
+      <span class="preloader__label top-left">STUDIO / FIELD NOTES</span>
+      <span class="preloader__label top-right">BRAND SYSTEMS<br />RESEARCH · FORM · MOTION</span>
       <svg class="preloader__mark" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <path class="preloader__line preloader__loop" pathLength="100" d="M 286 294 C 243 302 202 328 176 364 C 159 387 158 400 167 391 C 186 370 193 340 191 312 C 187 270 172 247 149 250 C 101 255 48 321 32 376 C 16 429 38 464 77 471 C 136 482 202 440 257 383 C 317 322 380 225 420 117 C 436 75 446 57 450 62" />
         <path class="preloader__line preloader__stem" pathLength="100" d="M 450 62 C 427 137 389 236 357 312 C 338 360 324 420 317 447 C 313 455 314 421 312 408 C 310 394 302 389 278 389 C 245 389 208 395 185 396" />
         <path class="preloader__line preloader__sweep" pathLength="100" d="M 286 294 C 230 307 187 350 164 391 C 157 404 171 399 186 389 C 221 361 285 332 356 307 C 411 287 452 276 472 271" />
         <path class="preloader__fill" fill-rule="evenodd" d="M 450 60 C 461 53 456 82 451 103 C 436 169 410 217 370 256 C 359 267 348 267 348 254 C 348 249 354 246 359 241 C 397 203 424 108 442 68 C 444 63 447 61 450 60 Z M 446 82 C 439 119 411 190 380 230 C 409 172 433 110 446 82 Z" />
       </svg>
+      <span class="preloader__label bottom-left">DESIGN STUDY / 01</span>
+      <span class="preloader__label bottom-right">INITIALIZING</span>
+      <span class="preloader__progress" aria-hidden="true"></span>
     </div>
     <div id="app"></div>
     <script>
       (() => {
         const root = document.documentElement;
         const preloader = document.getElementById('preloader');
-        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
         let pageLoaded = document.readyState === 'complete';
-        let logoFinished = reducedMotion;
+        let logoFinished = false;
         let exiting = false;
 
         function finish() {
@@ -79,18 +111,13 @@
             preloader.remove();
             root.classList.remove('is-preloading', 'is-preloader-exiting');
           };
-          if (reducedMotion) remove();
-          else {
-            preloader.addEventListener('transitionend', remove, { once: true });
-            setTimeout(remove, 600);
-          }
+          preloader.addEventListener('transitionend', remove, { once: true });
+          setTimeout(remove, 600);
         }
 
         if (!pageLoaded) addEventListener('load', () => { pageLoaded = true; finish(); }, { once: true });
-        if (!logoFinished) {
-          preloader?.querySelector('.preloader__fill')?.addEventListener('animationend', () => { logoFinished = true; finish(); }, { once: true });
-          setTimeout(() => { logoFinished = true; finish(); }, 3200);
-        }
+        preloader?.querySelector('.preloader__fill')?.addEventListener('animationend', () => { logoFinished = true; finish(); }, { once: true });
+        setTimeout(() => { logoFinished = true; finish(); }, 3200);
         finish();
       })();
     </script>
