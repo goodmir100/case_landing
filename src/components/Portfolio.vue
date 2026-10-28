@@ -57,6 +57,7 @@ const filter = ref('Все')
 const categories = ['Все', 'Стратегия', 'Маркетинг', 'Контент']
 const visibleCases = computed(() => filter.value === 'Все' ? cases : cases.filter(c => c.category === filter.value))
 const expanded = ref<number | null>(null)
+const taskPage = ref(0)
 const site = ref<HTMLElement | null>(null)
 let motion: ReturnType<typeof createPortfolioMotion> | undefined
 function updateRoute() { hash.value = location.hash || '#/'; scrollTo(0, 0) }
@@ -92,7 +93,29 @@ onUnmounted(() => {
 
       <section class="section ink"><svg class="ink-trail" viewBox="0 0 520 130" aria-hidden="true"><path pathLength="100" d="M8 92 C 92 35, 153 126, 230 66 S 395 22, 506 82" /><circle cx="48" cy="85" r="3" /><circle cx="444" cy="62" r="4" /><circle cx="476" cy="71" r="2" /></svg><div class="wrap"><h2 class="script-heading results-heading">Результаты</h2><h2>Маркетинг, за которым<br />стоят результаты</h2><div class="metrics"><a href="#/cases/a-prokat"><strong>×4</strong><span>Рост аудитории<br />А-ПРОКАТ</span><b></b></a><a href="#/cases/zhemchuzhina-kamy"><strong>3</strong><span>Продажи с рекламы<br />Жемчужина Камы</span><b></b></a><a href="#/cases/talan"><strong>+108%</strong><span>Рост подписчиков ВК<br />Талан · сентябрь 2026</span><b></b></a></div></div></section>
 
-      <section class="section wrap tasks-section"><div class="folder-sheet"><span class="paper-clip" aria-hidden="true"></span><h2>С какими задачами<br />ко мне обращаются</h2><div class="task-grid"><article v-for="(item,i) in tasks" :key="item[0]"><span>0{{ i+1 }}</span><h3>{{ item[0] }}</h3><p>{{ item[1] }}</p></article></div></div></section>
+      <section class="section wrap tasks-section" aria-labelledby="tasks-heading">
+        <h2 id="tasks-heading">С какими задачами<br />ко мне обращаются</h2>
+        <div class="task-album">
+          <div class="album-binding" aria-hidden="true"><span v-for="i in 5" :key="i"></span></div>
+          <div class="album-body">
+            <div class="album-top"><span>Задачи и решения</span><span>{{ String(taskPage + 1).padStart(2, '0') }} / 04</span></div>
+            <div class="album-page-area" aria-live="polite" aria-atomic="true">
+              <Transition name="page-turn" mode="out-in">
+                <article :key="taskPage" class="album-page">
+                  <span class="album-number">{{ String(taskPage + 1).padStart(2, '0') }}.</span>
+                  <h3>{{ tasks[taskPage]?.[0] }}</h3>
+                  <p>{{ tasks[taskPage]?.[1] }}</p>
+                </article>
+              </Transition>
+            </div>
+            <div class="album-controls" aria-label="Страницы альбома">
+              <button type="button" class="album-arrow" :disabled="taskPage === 0" aria-label="Предыдущая страница" @click="taskPage--">←</button>
+              <div class="album-tabs"><button v-for="(item, i) in tasks" :key="item[0]" type="button" :aria-label="`Страница ${i + 1}: ${item[0]}`" :aria-pressed="taskPage === i" @click="taskPage = i">0{{ i + 1 }}</button></div>
+              <button type="button" class="album-arrow" :disabled="taskPage === tasks.length - 1" aria-label="Следующая страница" @click="taskPage++">→</button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section class="section pale float-section"><svg class="float-mark star float-mark-left sparkle-icon" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 59 38 92 15 69 48 98 56 65 62 84 94 56 70 45 99 41 66 7 82 31 55 1 43 35 41 25 8 48 34Z" /></svg><div class="wrap"><h2 class="script-heading services-heading">Услуги</h2><h2>От исследования<br />до реализации</h2><p class="section-lead">Подбираю маркетинговые решения под задачи бизнеса. Можно начать с отдельной стратегии или выстроить комплексное продвижение.</p><div class="services"><article v-for="(item,i) in services" :key="item.title"><button type="button" :aria-expanded="expanded === i" @click="expanded = expanded === i ? null : i"><span>0{{ i+1 }}</span><strong>{{ item.title }}</strong><small>{{ item.need }}<br />Результат: {{ item.result }}</small><b>{{ expanded === i ? '−' : '+' }}</b></button><div v-if="expanded === i" class="service-open"><p>{{ item.scope }}</p><a href="#/contact">Обсудить услугу</a></div></article></div><a class="text-link" href="#/services">Все услуги и форматы работы</a></div></section>
 
