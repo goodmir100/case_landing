@@ -32,10 +32,12 @@ export function createPortfolioMotion(root: HTMLElement) {
     const maskedTargets = new Map<Element, HTMLElement[]>()
     observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue
-        maskedTargets.get(entry.target)?.forEach(element => element.classList.add('is-visible'))
-        entry.target.classList.add('is-visible')
-        observer?.unobserve(entry.target)
+        const targets = maskedTargets.get(entry.target) ?? [entry.target as HTMLElement]
+        if (entry.isIntersecting) {
+          targets.forEach(element => element.classList.add('is-visible'))
+        } else {
+          targets.forEach(element => element.classList.remove('is-visible'))
+        }
       }
     }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' })
 
