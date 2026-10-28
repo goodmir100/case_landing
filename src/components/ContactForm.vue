@@ -57,7 +57,7 @@ function submit() {
 
     <label class="consent-label" :for="`${idPrefix}-consent`"><input :id="`${idPrefix}-consent`" v-model="form.consent" type="checkbox" :aria-invalid="Boolean(errors.consent)" @change="validateField('consent')" /> <span>Я ознакомился(-ась) с <a href="#/privacy">политикой конфиденциальности</a> и согласен(-на) на обработку данных для ответа на обращение.</span></label>
     <span v-if="errors.consent" class="field-error">{{ errors.consent }}</span>
-    <button class="button" :class="dark ? 'pink-button' : 'dark'" type="submit">Открыть письмо ↗</button>
+    <button class="button" :class="dark ? 'pink-button' : 'dark'" type="submit">Открыть письмо</button>
     <p class="form-status" role="status">{{ status }}</p>
     <small>Данные остаются в браузере до открытия почтового приложения. Письмо отправляется только после вашего подтверждения в нём.</small>
   </form>
