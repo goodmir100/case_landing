@@ -68,23 +68,30 @@ let turnPointer: number | null = null
 let turnStartX = 0
 let turnStartTime = 0
 let turnTimer: ReturnType<typeof setTimeout> | undefined
-const turnStyle = computed(() => ({ transform: `rotateY(${turnDirection.value * -92 * turnProgress.value}deg)`, transformOrigin: turnDirection.value === 1 ? 'left center' : 'right center', transitionDuration: `${turnDuration.value}ms` }))
+let turnWillComplete = false
+const turnStyle = computed(() => ({ transform: `rotateY(${turnDirection.value * -90 * turnProgress.value}deg)`, transitionDuration: `${turnDuration.value}ms` }))
 const curlStyle = computed(() => {
   const bend = Math.sin(Math.PI * turnProgress.value)
   return { transform: `rotateY(${-turnDirection.value * 28 * bend}deg) translateZ(2px)`, opacity: bend, transitionDuration: `${turnDuration.value}ms`, animationDuration: `${turnDuration.value}ms` }
 })
+function commitTurn() {
+  clearTimeout(turnTimer)
+  if (turnWillComplete && turnTarget.value !== null) taskPage.value = turnTarget.value
+  turnTarget.value = null
+  turnProgress.value = 0
+  turnSettling.value = false
+  turnAuto.value = false
+}
+function onTurnTransitionEnd(event: TransitionEvent) {
+  if (event.target === event.currentTarget && event.propertyName === 'transform' && turnSettling.value) commitTurn()
+}
 function finishTurn(complete: boolean) {
+  turnWillComplete = complete
   turnDuration.value = Math.max(320, Math.round(760 * Math.abs((complete ? 1 : 0) - turnProgress.value)))
   turnSettling.value = true
   turnProgress.value = complete ? 1 : 0
   clearTimeout(turnTimer)
-  turnTimer = setTimeout(() => {
-    if (complete && turnTarget.value !== null) taskPage.value = turnTarget.value
-    turnTarget.value = null
-    turnProgress.value = 0
-    turnSettling.value = false
-    turnAuto.value = false
-  }, turnDuration.value)
+  turnTimer = setTimeout(commitTurn, turnDuration.value + 100)
 }
 function goToTaskPage(index: number) {
   if (index < 0 || index >= tasks.length || index === taskPage.value || turnTarget.value !== null) return
@@ -173,14 +180,13 @@ onUnmounted(() => {
                 <h3>{{ tasks[turnTarget]?.[0] }}</h3>
                 <p>{{ tasks[turnTarget]?.[1] }}</p>
               </article>
-              <div class="album-turn-sheet" :class="{ 'is-settling': turnSettling, 'is-reverse': turnDirection === -1, 'is-auto-turn': turnAuto }" :style="turnStyle">
+              <div class="album-turn-sheet" :class="{ 'is-settling': turnSettling, 'is-reverse': turnDirection === -1, 'is-auto-turn': turnAuto }" :style="turnStyle" @transitionend="onTurnTransitionEnd">
                 <article class="album-page album-frontpage">
                   <span class="album-number">{{ String(taskPage + 1).padStart(2, '0') }}.</span>
                   <h3>{{ tasks[taskPage]?.[0] }}</h3>
                   <p>{{ tasks[taskPage]?.[1] }}</p>
                   <span class="album-page-curl" :style="curlStyle" aria-hidden="true"></span>
                 </article>
-                <div class="album-page-back" aria-hidden="true"></div>
               </div>
               <button v-if="taskPage > 0" type="button" class="album-edge album-edge-prev" aria-label="Потянуть край: предыдущая страница" @pointerdown="startPageDrag($event, -1)" @pointermove="movePageDrag" @pointerup="endPageDrag" @pointercancel="cancelPageDrag" @click="($event as MouseEvent).detail === 0 && goToTaskPage(taskPage - 1)"><span aria-hidden="true"></span></button>
               <button v-if="taskPage < tasks.length - 1" type="button" class="album-edge album-edge-next" aria-label="Потянуть край: следующая страница" @pointerdown="startPageDrag($event, 1)" @pointermove="movePageDrag" @pointerup="endPageDrag" @pointercancel="cancelPageDrag" @click="($event as MouseEvent).detail === 0 && goToTaskPage(taskPage + 1)"><span aria-hidden="true"></span></button>

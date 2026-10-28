@@ -665,9 +665,10 @@ button, .button, .header-link, .hero .actions .button, .design-teaser .button.da
 
 /* A page follows the pointer, then settles into the next sheet. */
 .album-page-area { position: relative; display: block; min-height: 360px; overflow: hidden; perspective: 1400px; background: #f8f2e8; }
-.album-turn-sheet { position: relative; z-index: 2; width: 100%; min-height: 360px; transform-style: preserve-3d; background: #fffdf8; box-shadow: 8px 0 20px rgba(57, 43, 28, .12); will-change: transform; }
+.album-turn-sheet { position: relative; z-index: 2; width: 100%; min-height: 360px; transform-style: preserve-3d; transform-origin: left center; background: #fffdf8; box-shadow: 8px 0 20px rgba(57, 43, 28, .12); will-change: transform; }
+.album-turn-sheet.is-reverse { transform-origin: right center; }
 .album-turn-sheet.is-settling { transition: transform 760ms var(--motion-ease-in-out); }
-.album-frontpage, .album-page-back { min-height: 360px; padding: 40px 24px; backface-visibility: hidden; }
+.album-frontpage { min-height: 360px; padding: 40px 24px; backface-visibility: hidden; }
 .album-frontpage { position: relative; z-index: 1; background: linear-gradient(90deg, #f4ece0, #fffdf8 7%, #fffdf8 93%, #eee3d3); }
 .album-page-curl { position: absolute; z-index: 2; top: 0; right: 0; bottom: 0; width: 20%; transform-origin: left center; background: linear-gradient(90deg, transparent 0%, rgba(130, 99, 70, .08) 42%, rgba(255, 255, 255, .88) 78%, #e6d5be 100%); box-shadow: 10px 0 14px rgba(69, 49, 30, .13); pointer-events: none; backface-visibility: hidden; }
 .album-turn-sheet.is-reverse .album-page-curl { left: 0; right: auto; transform-origin: right center; background: linear-gradient(270deg, transparent 0%, rgba(130, 99, 70, .08) 42%, rgba(255, 255, 255, .88) 78%, #e6d5be 100%); box-shadow: -10px 0 14px rgba(69, 49, 30, .13); }
@@ -682,8 +683,7 @@ button, .button, .header-link, .hero .actions .button, .design-teaser .button.da
   0%, 100% { opacity: 0; transform: rotateY(0deg) translateZ(2px); }
   50% { opacity: 1; transform: rotateY(28deg) translateZ(2px); }
 }
-.album-page-back { position: absolute; inset: 0; transform: rotateY(180deg); background: linear-gradient(90deg, #eee3d3, #fffaf1 9%, #f7f0e5); box-shadow: inset 10px 0 24px rgba(57, 43, 28, .12); }
-.album-underpage { position: absolute; inset: 0; z-index: 1; padding: 40px 24px; background: #fffdf8; }
+.album-underpage { position: absolute; inset: 0; z-index: 1; padding: 40px 24px; background: linear-gradient(90deg, #f4ece0, #fffdf8 7%, #fffdf8 93%, #eee3d3); }
 .album-edge { position: absolute; z-index: 4; top: 0; bottom: 0; width: 54px; border: 0; background: transparent; color: #8e7767; cursor: grab; touch-action: none; }
 .album-edge:active { cursor: grabbing; }
 .album-edge-prev { left: 0; }
@@ -695,7 +695,7 @@ button, .button, .header-link, .hero .actions .button, .design-teaser .button.da
 .album-hint { font-size: 12px; color: #6e6258; }
 .album-tabs { flex: 0 0 auto; }
 @media (max-width: 760px) {
-  .album-page-area, .album-turn-sheet, .album-frontpage, .album-page-back { min-height: 420px; }
+  .album-page-area, .album-turn-sheet, .album-frontpage { min-height: 420px; }
   .album-edge { width: 38px; }
   .album-frontpage, .album-underpage { padding: 40px 34px; }
   .album-hint { font-size: 11px; max-width: 110px; }
