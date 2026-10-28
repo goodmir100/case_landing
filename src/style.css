@@ -616,3 +616,17 @@ body { background: var(--paper); }
   .task-grid article { transition: none; }
   .task-grid article:hover { transform: none; }
 }
+
+/* Requested visual refinements */
+.hero-collage:before { background: var(--red-raw); }
+button, .button, .header-link, .hero .actions .button, .design-teaser .button.dark { border-radius: 0; }
+.button-symbol { border-radius: 0; }
+.brands-section { background: #fffdf8; color: var(--ink); border: 0; }
+.brand-grid { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 36px 48px; border: 0; }
+.brand-cell { flex: 1 1 170px; min-height: 90px; padding: 10px; border: 0; }
+.brand-cell img { max-width: 175px; max-height: 65px; filter: none; }
+@media (max-width: 760px) {
+  .brand-grid { justify-content: center; gap: 20px; }
+  .brand-cell { flex: 1 1 120px; min-height: 75px; padding: 10px; }
+  .brand-cell img { max-height: 55px; }
+}
