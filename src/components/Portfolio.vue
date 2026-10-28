@@ -58,6 +58,76 @@ const categories = ['Все', 'Стратегия', 'Маркетинг', 'Ко�
 const visibleCases = computed(() => filter.value === 'Все' ? cases : cases.filter(c => c.category === filter.value))
 const expanded = ref<number | null>(null)
 const taskPage = ref(0)
+const animationsEnabled = ref(true)
+function setAnimationsEnabled(enabled: boolean) {
+  animationsEnabled.value = enabled
+  document.documentElement.classList.toggle('motion-off', !enabled)
+  try { localStorage.setItem('portfolio-animations-v1', enabled ? 'on' : 'off') } catch { /* Storage may be unavailable. */ }
+}
+const turnTarget = ref<number | null>(null)
+const turnProgress = ref(0)
+const turnSettling = ref(false)
+const turnDirection = ref(1)
+let turnPointer: number | null = null
+let turnStartX = 0
+let turnStartTime = 0
+let turnTimer: ReturnType<typeof setTimeout> | undefined
+const turnStyle = computed(() => ({ transform: `rotateY(${turnDirection.value * -180 * turnProgress.value}deg)`, transformOrigin: turnDirection.value === 1 ? 'left center' : 'right center' }))
+function finishTurn(complete: boolean) {
+  if (!animationsEnabled.value) {
+    if (complete && turnTarget.value !== null) taskPage.value = turnTarget.value
+    turnTarget.value = null
+    turnProgress.value = 0
+    turnSettling.value = false
+    return
+  }
+  turnSettling.value = true
+  turnProgress.value = complete ? 1 : 0
+  clearTimeout(turnTimer)
+  turnTimer = setTimeout(() => {
+    if (complete && turnTarget.value !== null) taskPage.value = turnTarget.value
+    turnTarget.value = null
+    turnProgress.value = 0
+    turnSettling.value = false
+  }, 420)
+}
+function goToTaskPage(index: number) {
+  if (index < 0 || index >= tasks.length || index === taskPage.value || turnTarget.value !== null) return
+  if (!animationsEnabled.value) { taskPage.value = index; return }
+  turnDirection.value = index > taskPage.value ? 1 : -1
+  turnTarget.value = index
+  turnProgress.value = 0
+  requestAnimationFrame(() => requestAnimationFrame(() => finishTurn(true)))
+}
+function startPageDrag(event: PointerEvent, direction: number) {
+  if (turnPointer !== null || turnTarget.value !== null) return
+  const index = taskPage.value + direction
+  if (index < 0 || index >= tasks.length) return
+  turnPointer = event.pointerId
+  turnStartX = event.clientX
+  turnStartTime = performance.now()
+  turnDirection.value = direction
+  turnTarget.value = index
+  turnProgress.value = 0
+  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+}
+function movePageDrag(event: PointerEvent) {
+  if (event.pointerId !== turnPointer) return
+  const width = (event.currentTarget as HTMLElement).closest('.album-page-area')?.clientWidth || 1
+  if (animationsEnabled.value) turnProgress.value = Math.min(1, Math.max(0, (turnStartX - event.clientX) * turnDirection.value / (width * .7)))
+}
+function endPageDrag(event: PointerEvent) {
+  if (event.pointerId !== turnPointer) return
+  const travel = (turnStartX - event.clientX) * turnDirection.value
+  const velocity = travel / Math.max(1, performance.now() - turnStartTime)
+  turnPointer = null
+  finishTurn(travel < 5 || turnProgress.value > .28 || velocity > .45)
+}
+function cancelPageDrag(event: PointerEvent) {
+  if (event.pointerId !== turnPointer) return
+  turnPointer = null
+  finishTurn(false)
+}
 const site = ref<HTMLElement | null>(null)
 let motion: ReturnType<typeof createPortfolioMotion> | undefined
 function updateRoute() { hash.value = location.hash || '#/'; scrollTo(0, 0) }
@@ -68,6 +138,8 @@ function focusMain() {
   main?.focus()
 }
 onMounted(() => {
+  try { animationsEnabled.value = localStorage.getItem('portfolio-animations-v1') !== 'off' } catch { /* Use the default. */ }
+  document.documentElement.classList.toggle('motion-off', !animationsEnabled.value)
   addEventListener('hashchange', updateRoute)
   if (site.value) motion = createPortfolioMotion(site.value)
 })
@@ -78,6 +150,7 @@ watch([route, filter], async () => {
 onUnmounted(() => {
   removeEventListener('hashchange', updateRoute)
   motion?.destroy()
+  clearTimeout(turnTimer)
 })
 </script>
 
@@ -100,18 +173,26 @@ onUnmounted(() => {
           <div class="album-body">
             <div class="album-top"><span>Задачи и решения</span><span>{{ String(taskPage + 1).padStart(2, '0') }} / 04</span></div>
             <div class="album-page-area" aria-live="polite" aria-atomic="true">
-              <Transition name="page-turn" mode="out-in">
-                <article :key="taskPage" class="album-page">
+              <article v-if="turnTarget !== null" class="album-page album-underpage" aria-hidden="true">
+                <span class="album-number">{{ String(turnTarget + 1).padStart(2, '0') }}.</span>
+                <h3>{{ tasks[turnTarget]?.[0] }}</h3>
+                <p>{{ tasks[turnTarget]?.[1] }}</p>
+              </article>
+              <div class="album-turn-sheet" :class="{ 'is-settling': turnSettling }" :style="turnStyle">
+                <article class="album-page album-frontpage">
                   <span class="album-number">{{ String(taskPage + 1).padStart(2, '0') }}.</span>
                   <h3>{{ tasks[taskPage]?.[0] }}</h3>
                   <p>{{ tasks[taskPage]?.[1] }}</p>
                 </article>
-              </Transition>
+                <div class="album-page-back" aria-hidden="true"></div>
+              </div>
+              <button v-if="taskPage > 0" type="button" class="album-edge album-edge-prev" aria-label="Потянуть край: предыдущая страница" @pointerdown="startPageDrag($event, -1)" @pointermove="movePageDrag" @pointerup="endPageDrag" @pointercancel="cancelPageDrag" @click="($event as MouseEvent).detail === 0 && goToTaskPage(taskPage - 1)"><span aria-hidden="true"></span></button>
+              <button v-if="taskPage < tasks.length - 1" type="button" class="album-edge album-edge-next" aria-label="Потянуть край: следующая страница" @pointerdown="startPageDrag($event, 1)" @pointermove="movePageDrag" @pointerup="endPageDrag" @pointercancel="cancelPageDrag" @click="($event as MouseEvent).detail === 0 && goToTaskPage(taskPage + 1)"><span aria-hidden="true"></span></button>
             </div>
             <div class="album-controls" aria-label="Страницы альбома">
-              <button type="button" class="album-arrow" :disabled="taskPage === 0" aria-label="Предыдущая страница" @click="taskPage--">←</button>
-              <div class="album-tabs"><button v-for="(item, i) in tasks" :key="item[0]" type="button" :aria-label="`Страница ${i + 1}: ${item[0]}`" :aria-pressed="taskPage === i" @click="taskPage = i">0{{ i + 1 }}</button></div>
-              <button type="button" class="album-arrow" :disabled="taskPage === tasks.length - 1" aria-label="Следующая страница" @click="taskPage++">→</button>
+              <span class="album-hint">Потяните за край страницы</span>
+              <div class="album-tabs"><button v-for="(item, i) in tasks" :key="item[0]" type="button" :aria-label="`Страница ${i + 1}: ${item[0]}`" :aria-pressed="taskPage === i" @click="goToTaskPage(i)">0{{ i + 1 }}</button></div>
+              <button type="button" class="album-motion-toggle" :aria-pressed="animationsEnabled" @click="setAnimationsEnabled(!animationsEnabled)">Анимация: {{ animationsEnabled ? 'вкл.' : 'выкл.' }}</button>
             </div>
           </div>
         </div>

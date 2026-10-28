@@ -71,11 +71,9 @@
       @keyframes blueprint-scan { 0% { transform: translateY(-2vh); opacity: 0; } 15%, 80% { opacity: .8; } 100% { transform: translateY(102vh); opacity: 0; } }
       @keyframes blueprint-progress { 0% { transform: translateX(-110%); } 100% { transform: translateX(350%); } }
       @media (max-width: 600px) { .preloader__label { font-size: 8px; letter-spacing: .14em; } .preloader__mark { width: min(68vw, 36vh, 300px); } }
-      @media (prefers-reduced-motion: reduce) {
-        .preloader, .preloader__ring, .preloader__scan, .preloader__progress:after { animation: none; transition: none; }
-        .preloader__line { animation: none; stroke-dashoffset: 0; }
-        .preloader__fill { animation: none; opacity: 1; }
-      }
+      .motion-off .preloader, .motion-off .preloader__ring, .motion-off .preloader__scan, .motion-off .preloader__progress:after { animation: none; transition: none; }
+      .motion-off .preloader__line { animation: none; stroke-dashoffset: 0; }
+      .motion-off .preloader__fill { animation: none; opacity: 1; }
     </style>
     <noscript><style>.preloader { display: none; } html.is-preloading, html.is-preloading body { overflow: auto; } html.is-preloading #app { visibility: visible; }</style></noscript>
   </head>
@@ -103,9 +101,10 @@
     <script>
       (() => {
         const root = document.documentElement;
+        try { root.classList.toggle('motion-off', localStorage.getItem('portfolio-animations-v1') === 'off'); } catch { /* Use the default. */ }
         const preloader = document.getElementById('preloader');
         let pageLoaded = document.readyState === 'complete';
-        let logoFinished = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let logoFinished = root.classList.contains('motion-off');
         let exiting = false;
 
         function finish() {
