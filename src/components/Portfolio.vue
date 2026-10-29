@@ -57,6 +57,7 @@ const filter = ref('Все')
 const categories = ['Все', 'Стратегия', 'Маркетинг', 'Контент']
 const visibleCases = computed(() => filter.value === 'Все' ? cases : cases.filter(c => c.category === filter.value))
 const expanded = ref<number | null>(null)
+const mobileMenuOpen = ref(false)
 const taskPage = ref(0)
 const turnTarget = ref<number | null>(null)
 const turnProgress = ref(0)
@@ -145,6 +146,9 @@ function cancelPageDrag(event: PointerEvent) {
 const site = ref<HTMLElement | null>(null)
 let motion: ReturnType<typeof createPortfolioMotion> | undefined
 function updateRoute() { hash.value = location.hash || '#/'; scrollTo(0, 0) }
+function closeMenuOnEscape(event: KeyboardEvent) {
+  if (event.key === 'Escape') mobileMenuOpen.value = false
+}
 function openCookieSettings() { window.dispatchEvent(new Event('open-cookie-settings')) }
 function focusMain() {
   const main = site.value?.querySelector<HTMLElement>('main')
@@ -153,14 +157,17 @@ function focusMain() {
 }
 onMounted(() => {
   addEventListener('hashchange', updateRoute)
+  addEventListener('keydown', closeMenuOnEscape)
   if (site.value) motion = createPortfolioMotion(site.value)
 })
 watch([route, filter], async () => {
+  mobileMenuOpen.value = false
   await nextTick()
   motion?.refresh()
 })
 onUnmounted(() => {
   removeEventListener('hashchange', updateRoute)
+  removeEventListener('keydown', closeMenuOnEscape)
   motion?.destroy()
   clearTimeout(turnTimer)
 })
@@ -170,7 +177,7 @@ onUnmounted(() => {
   <div ref="site" class="site">
     <button class="skip-link" type="button" @click="focusMain">Перейти к содержимому</button>
     <div class="motion-progress" aria-hidden="true"></div>
-    <header class="header"><div class="wrap header-inner"><a class="logo" href="#/" aria-label="Brand Marketing — главная"><svg class="sparkle-icon logo-sparkle" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 59 38 92 15 69 48 98 56 65 62 84 94 56 70 45 99 41 66 7 82 31 55 1 43 35 41 25 8 48 34Z" /></svg><span>BRAND</span><span>MARKETING</span></a><nav aria-label="Основная навигация"><a href="#/services">Услуги</a><a href="#/cases">Кейсы</a><a href="#/design">Дизайн</a><a href="#/about">Обо мне</a></nav><a class="header-link" href="#/contact">Обсудить проект</a></div></header>
+    <header class="header"><div class="wrap header-inner"><a class="logo" href="#/" aria-label="Brand Marketing — главная"><svg class="sparkle-icon logo-sparkle" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 59 38 92 15 69 48 98 56 65 62 84 94 56 70 45 99 41 66 7 82 31 55 1 43 35 41 25 8 48 34Z" /></svg><span>BRAND</span><span>MARKETING</span></a><button class="menu-toggle" type="button" aria-controls="primary-navigation" :aria-expanded="mobileMenuOpen" :aria-label="mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'" @click="mobileMenuOpen = !mobileMenuOpen"><span aria-hidden="true">{{ mobileMenuOpen ? '×' : '☰' }}</span></button><nav id="primary-navigation" :class="{ 'is-open': mobileMenuOpen }" aria-label="Основная навигация" @click="mobileMenuOpen = false"><a href="#/services">Услуги</a><a href="#/cases">Кейсы</a><a href="#/design">Дизайн</a><a href="#/about">Обо мне</a><a class="mobile-contact-link" href="#/contact">Обсудить проект</a></nav><a class="header-link" href="#/contact">Обсудить проект</a></div></header>
 
     <main v-if="route === '/'" tabindex="-1">
       <section class="hero wrap"><div class="hero-copy"><h1>Маркетинг<br />с <em>понятной</em><br />целью</h1><p class="lead">Помогаю бизнесу находить своё место на рынке, выделяться среди конкурентов и привлекать клиентов.</p><p class="muted">Исследую аудиторию и рынок, разрабатываю позиционирование и стратегию продвижения. Превращаю исследования в конкретные маркетинговые решения.</p><div class="actions"><a class="button hero-cta" href="#/contact">Обсудить проект <span class="button-symbol" aria-hidden="true">+</span></a><a class="button hero-secondary" href="#/cases">Смотреть кейсы</a></div></div><div class="hero-collage"><div class="collage-print"><img src="/portrait-diploma.jpg" alt="Бренд-маркетолог с дипломом на Дворцовой площади" width="1086" height="1448" fetchpriority="high" /></div><div class="collage-secondary"><img src="/portrait-evening.jpg" alt="Бренд-маркетолог на вечернем фоне" width="1920" height="2560" loading="lazy" /></div><svg class="collage-star sparkle-icon" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 59 38 92 15 69 48 98 56 65 62 84 94 56 70 45 99 41 66 7 82 31 55 1 43 35 41 25 8 48 34Z" /></svg><span class="collage-sticker">MAKE IT MATTER</span></div></section>
