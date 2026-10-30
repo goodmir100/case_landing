@@ -178,7 +178,7 @@ body { background: var(--paper); }
 .design-teaser .button.dark:hover { background: var(--ink); color: #fff; }
 .design-types { position: relative; border-top: 2px solid #f8c4cc; }
 .design-types article { border-color: #f8c4cc; }
-.design-doodle { position: absolute; top: -150px; left: 0; font: 58px/.68 'Disruptors Script', Georgia, cursive; transform: rotate(-11deg); text-shadow: 2px 2px var(--ink); }
+.design-types .design-doodle { position: absolute; top: -165px; left: 0; color: #fffdf8; font: italic 700 clamp(50px, 4.3vw, 72px)/.9 Georgia, serif; letter-spacing: -.06em; transform: rotate(-7deg); text-shadow: none; }
 .about-art { background: var(--ink); color: transparent; -webkit-text-stroke: 3px #fff; font-size: 210px; transform: rotate(-2deg); box-shadow: 9px 9px 0 var(--red-raw); overflow: hidden; }
 .about-art:before { content: ''; position: absolute; inset: 17px; border: 1px solid #bbb1ad; }
 .about-art span { color: var(--red-raw); -webkit-text-stroke: 0; font-size: 85px; }
@@ -238,7 +238,7 @@ body { background: var(--paper); }
   .task-grid article { border-color: var(--ink); }
   .services button { padding-block: 21px; }
   .case-art { height: 270px; }
-  .design-doodle { position: static; display: block; margin: 8px 0 25px; }
+  .design-types .design-doodle { position: static; display: block; margin: 8px 0 25px; }
   .about-art { font-size: 170px; }
   .inner:before { font-size: 60px; top: 110px; right: 0; }
 }
@@ -254,7 +254,7 @@ body { background: var(--paper); }
   .collage-date { font-size: 16px; }
   .collage-star { width: 95px; height: 95px; }
   .section h2, .contact-section h2 { font-size: clamp(36px, 9.2vw, 50px); }
-  .design-doodle { font-size: 45px; }
+  .design-types .design-doodle { font-size: 45px; }
   .inner:before { opacity: .3; }
 }
 
@@ -570,11 +570,6 @@ body { background: var(--paper); }
 .case-card { background: #fffdf8; padding: 14px 14px 22px; border: 1px solid #cdbfaf; box-shadow: 5px 6px 0 #d6c8b7; }
 .case-card .case-art { box-shadow: none; }
 .case-card > small, .case-card h3, .case-card h2, .case-card p, .case-card > div:last-child { margin-inline: 8px; }
-.brands-section { background: #332d29; color: #fffdf8; border-block: 2px solid var(--ink); }
-.brands-section h2 { font-size: clamp(40px, 4.5vw, 70px); max-width: 950px; }
-.brand-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid #766c64; border-left: 1px solid #766c64; }
-.brand-cell { min-height: 150px; display: flex; align-items: center; justify-content: center; padding: 22px; border-right: 1px solid #766c64; border-bottom: 1px solid #766c64; }
-.brand-cell img { display: block; width: 100%; max-width: 190px; max-height: 70px; object-fit: contain; filter: brightness(0) invert(1); }
 .design-teaser .button.dark { border-radius: 22px 5px 22px 5px; }
 .about-page > div { padding: 0; border: 10px solid #fffdf8; background: #fffdf8; overflow: hidden; }
 .about-page > div img { width: 100%; height: 100%; max-height: 650px; object-fit: cover; object-position: center 30%; }
@@ -587,7 +582,7 @@ body { background: var(--paper); }
 .footer > div { min-height: 140px; }
 .footer a:not(.logo), .footer button { font-size: 12px; line-height: 1.5; font-weight: 700; color: #fffdf8; }
 .footer-settings { text-decoration: none; }
-.about-teaser, .process article, .formats article { background-color: #fffdf8; }
+.process article, .formats article { background-color: #fffdf8; }
 @media (max-width: 760px) {
   .hero { min-height: 0; }
   .hero h1 { font-size: clamp(37px, 8vw, 56px); }
@@ -599,9 +594,6 @@ body { background: var(--paper); }
   .metrics a, .metrics a + a { min-height: 185px; }
   .task-grid { grid-template-columns: 1fr; }
   .task-grid article { min-height: 0; }
-  .brand-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .brand-cell { min-height: 110px; padding: 15px; }
-  .brand-cell img { max-height: 55px; }
 }
 @media (max-width: 430px) {
   .logo { font-size: 14px; }
@@ -621,16 +613,6 @@ body { background: var(--paper); }
 .hero-collage:before { background: var(--red-raw); }
 button, .button, .header-link, .hero .actions .button, .design-teaser .button.dark { border-radius: 0; }
 .button-symbol { border-radius: 0; }
-.brands-section { background: #fffdf8; color: var(--ink); border: 0; }
-.brand-grid { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 36px 48px; border: 0; }
-.brand-cell { flex: 1 1 170px; min-height: 90px; padding: 10px; border: 0; }
-.brand-cell img { max-width: 175px; max-height: 65px; filter: none; }
-@media (max-width: 760px) {
-  .brand-grid { justify-content: center; gap: 20px; }
-  .brand-cell { flex: 1 1 120px; min-height: 75px; padding: 10px; }
-  .brand-cell img { max-height: 55px; }
-}
-
 /* Task album */
 .tasks-section > h2 { max-width: 900px; margin-bottom: 48px; }
 .task-album { display: flex; position: relative; background: #f1e8db; border: 1px solid #a99c8d; box-shadow: 8px 8px 0 #d8cbb9, 9px 9px 0 #a99c8d; }
@@ -766,4 +748,39 @@ button, .button, .header-link, .hero .actions .button, .design-teaser .button.da
   .hero h1 em { font-size: clamp(4rem, 20vw, 5.5rem); }
   .hero-collage { height: min(105vw, 24rem); }
   .collage-sticker { min-width: 0; white-space: normal; }
+}
+
+/* Portfolio section refinements. */
+.process, .formats { border-top: 0; }
+.process article, .formats article {
+  min-width: 0;
+  padding: 30px 26px 28px;
+  border-top: 4px solid var(--red-raw);
+}
+.process article + article, .formats article + article {
+  padding-left: 26px;
+  border-top-color: var(--red-raw);
+}
+.process h3, .formats h3 { color: var(--red-raw); }
+.process p, .formats p { color: #3b3531; }
+
+.about-teaser {
+  padding-inline: clamp(24px, 3vw, 48px);
+  background: #f7e3df;
+}
+
+.contact-form-dark input:not([type="checkbox"]),
+.contact-form-dark textarea {
+  color: #ff5268;
+  caret-color: #ff5268;
+  border-color: #8b7d7c;
+}
+
+@media (max-width: 760px) {
+  .process article:nth-child(n), .formats article:nth-child(n) { padding: 24px 20px; border-top: 4px solid var(--red-raw); }
+  .about-teaser { padding-inline: 24px; }
+}
+
+@media (max-width: 430px) {
+  .process article:nth-child(n), .formats article:nth-child(n) { padding: 22px 18px; }
 }

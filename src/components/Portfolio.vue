@@ -28,14 +28,6 @@ const tasks = [
   ['Вкладываетесь в маркетинг, но не видите результата?', 'Проанализирую текущие инструменты, найду слабые места и выстрою план продвижения с понятными целями и показателями.'],
   ['Хотите привлекать клиентов через контент?', 'Разработаю контент-стратегию, организую съёмки и создам материалы, которые раскрывают ценность продукта и ведут аудиторию к покупке.'],
 ]
-const clientLogos = [
-  ['JustFinTech', 'justfintech.svg'], ['Институт инновации Соларжи', 'solarji.svg'],
-  ['YUNIKA', 'yunika.svg'], ['Стендап клуб на Трубной', 'standup.svg'],
-  ['YOLO', 'yolo.svg'], ['Специализированный застройщик Федерация', 'federation.svg'],
-  ['апрокат', 'aprokat.svg'], ['ЦЕНТРСВЕТ', 'centersvet.svg'],
-  ['ТВОЕ', 'tvoe.svg'], ['РЖД', 'rzd.svg'],
-  ['ТАЛАН', 'talan.svg'], ['Наука и жизнь', 'science-life.svg'],
-]
 const process = [
   ['Знакомство и брифинг', 'Обсуждаем продукт, задачи, текущий маркетинг, бюджет и ожидаемый результат.', 'Согласованные цели и объём работ.'],
   ['Анализ и исследование', 'Изучаю рынок, конкурентов, аудиторию и существующие каналы.', 'Выводы и точки роста.'],
@@ -219,8 +211,6 @@ onUnmounted(() => {
       <section class="section pale float-section"><svg class="float-mark star float-mark-left sparkle-icon" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 59 38 92 15 69 48 98 56 65 62 84 94 56 70 45 99 41 66 7 82 31 55 1 43 35 41 25 8 48 34Z" /></svg><div class="wrap"><h2 class="script-heading services-heading">Услуги</h2><h2>От исследования<br />до реализации</h2><p class="section-lead">Подбираю маркетинговые решения под задачи бизнеса. Можно начать с отдельной стратегии или выстроить комплексное продвижение.</p><div class="services"><article v-for="(item,i) in services" :key="item.title"><button type="button" :aria-expanded="expanded === i" @click="expanded = expanded === i ? null : i"><span>0{{ i+1 }}</span><strong>{{ item.title }}</strong><small>{{ item.need }}<br />Результат: {{ item.result }}</small><b>{{ expanded === i ? '−' : '+' }}</b></button><div v-if="expanded === i" class="service-open"><p>{{ item.scope }}</p><a href="#/contact">Обсудить услугу</a></div></article></div><a class="text-link" href="#/services">Все услуги и форматы работы</a></div></section>
 
       <section class="section wrap float-section"><div class="heading-row"><div><p class="eyebrow">Избранные проекты</p><h2>Проекты, в которых<br />маркетинг решает задачи</h2></div><a class="text-link" href="#/cases">Все кейсы</a></div><div class="case-grid"><a v-for="(item,i) in cases" :key="item.slug" class="case-card" :href="`#/cases/${item.slug}`"><div class="case-art" :class="`art-${i+1}`">{{ item.title }}</div><small>{{ item.tags }}</small><h3>{{ item.title }}</h3><p>{{ item.summary }}</p><div><b>{{ item.result }}</b><span>Подробнее</span></div></a></div></section>
-
-      <section class="section brands-section"><div class="wrap"><h2>Бренды и мое сотрудничество</h2><div class="brand-grid"><div v-for="item in clientLogos" :key="item[0]" class="brand-cell"><img :src="`/logos/${item[1]}`" :alt="item[0]" loading="lazy" /></div></div></div></section>
 
       <section class="section ink"><svg class="ink-trail" viewBox="0 0 520 130" aria-hidden="true"><path pathLength="100" d="M8 92 C 92 35, 153 126, 230 66 S 395 22, 506 82" /><circle cx="48" cy="85" r="3" /><circle cx="444" cy="62" r="4" /><circle cx="476" cy="71" r="2" /></svg><div class="wrap approach"><div><p class="eyebrow pink">Подход</p><h2>Сначала разбираюсь<br />в бизнесе Потом<br /><em>предлагаю решения</em></h2><p>Изучаю продукт, рынок, конкурентов и поведение покупателей, чтобы принимать решения на основе данных.</p></div><ol><li v-for="(item,i) in [['Исследования','Кто покупает, почему выбирает и что мешает покупке.'],['Стратегия','Как выделить бренд и достичь целей.'],['Реализация','Коммуникации, контент и рекламные материалы.'],['Аналитика','Оценка результатов и корректировка продвижения.']]" :key="item[0]"><span>0{{ i+1 }}</span><div><strong>{{ item[0] }}</strong><p>{{ item[1] }}</p></div></li></ol></div></section>
 
