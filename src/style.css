@@ -900,3 +900,5 @@ button, .button, .header-link, .hero .actions .button, .design-teaser .button.da
   .service-page article > span { justify-content: flex-start; padding: 14px 20px; font-size: 31px; }
   .service-page article > div { padding: 22px 20px 26px; }
 }
+
+.cookie-actions .button { border-radius: 0; }
