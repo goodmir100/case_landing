@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { createPortfolioMotion } from '../motion'
 import ContactForm from './ContactForm.vue'
+import TaskNotebook from './TaskNotebook.vue'
 import CookieNotice from './CookieNotice.vue'
 import PrivacyPolicy from './PrivacyPolicy.vue'
 import { emailReady, safeTelegram, safeWhatsapp, siteConfig } from '../site-config'
@@ -50,91 +51,6 @@ const categories = ['Все', 'Стратегия', 'Маркетинг', 'Ко�
 const visibleCases = computed(() => filter.value === 'Все' ? cases : cases.filter(c => c.category === filter.value))
 const expanded = ref<number | null>(null)
 const mobileMenuOpen = ref(false)
-const taskPage = ref(0)
-const turnTarget = ref<number | null>(null)
-const turnProgress = ref(0)
-const turnSettling = ref(false)
-const turnDirection = ref(1)
-const turnDuration = ref(760)
-const turnAuto = ref(false)
-let turnPointer: number | null = null
-let turnStartX = 0
-let turnStartTime = 0
-let turnTimer: ReturnType<typeof setTimeout> | undefined
-let turnWillComplete = false
-const turnStyle = computed(() => {
-  const edge = turnDirection.value === 1 ? 100 * (1 - turnProgress.value) : 100 * turnProgress.value
-  const bend = 4 * Math.sin(Math.PI * turnProgress.value)
-  const top = `${Math.max(0, Math.min(100, edge - bend))}%`
-  const middle = `${Math.max(0, Math.min(100, edge + bend))}%`
-  const path = turnDirection.value === 1
-    ? `polygon(0 0, ${top} 0, ${middle} 50%, ${top} 100%, 0 100%)`
-    : `polygon(${top} 0, 100% 0, 100% 100%, ${top} 100%, ${middle} 50%)`
-  return { clipPath: path, transitionDuration: `${turnDuration.value}ms` }
-})
-const curlStyle = computed(() => {
-  const bend = Math.sin(Math.PI * turnProgress.value)
-  const edge = turnDirection.value === 1 ? 100 * (1 - turnProgress.value) : 100 * turnProgress.value
-  return { left: `calc(${edge}% - 26px)`, transform: `perspective(320px) rotateY(${-turnDirection.value * 52 * bend}deg) skewY(${turnDirection.value * 4 * bend}deg)`, opacity: bend, transitionDuration: `${turnDuration.value}ms`, animationDuration: `${turnDuration.value}ms` }
-})
-function commitTurn() {
-  clearTimeout(turnTimer)
-  if (turnWillComplete && turnTarget.value !== null) taskPage.value = turnTarget.value
-  turnTarget.value = null
-  turnProgress.value = 0
-  turnSettling.value = false
-  turnAuto.value = false
-}
-function onTurnTransitionEnd(event: TransitionEvent) {
-  if (event.target === event.currentTarget && event.propertyName === 'clip-path' && turnSettling.value) commitTurn()
-}
-function finishTurn(complete: boolean) {
-  turnWillComplete = complete
-  turnDuration.value = Math.max(320, Math.round(760 * Math.abs((complete ? 1 : 0) - turnProgress.value)))
-  turnSettling.value = true
-  turnProgress.value = complete ? 1 : 0
-  clearTimeout(turnTimer)
-  turnTimer = setTimeout(commitTurn, turnDuration.value + 100)
-}
-function goToTaskPage(index: number) {
-  if (index < 0 || index >= tasks.length || index === taskPage.value || turnTarget.value !== null) return
-  turnDirection.value = index > taskPage.value ? 1 : -1
-  turnAuto.value = true
-  turnTarget.value = index
-  turnProgress.value = 0
-  requestAnimationFrame(() => requestAnimationFrame(() => finishTurn(true)))
-}
-function startPageDrag(event: PointerEvent, direction: number) {
-  if (turnPointer !== null || turnTarget.value !== null) return
-  const index = taskPage.value + direction
-  if (index < 0 || index >= tasks.length) return
-  turnPointer = event.pointerId
-  turnStartX = event.clientX
-  turnStartTime = performance.now()
-  turnDirection.value = direction
-  turnAuto.value = false
-  turnTarget.value = index
-  turnProgress.value = 0
-  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
-}
-function movePageDrag(event: PointerEvent) {
-  if (event.pointerId !== turnPointer) return
-  const width = (event.currentTarget as HTMLElement).closest('.album-page-area')?.clientWidth || 1
-  turnProgress.value = Math.min(1, Math.max(0, (turnStartX - event.clientX) * turnDirection.value / (width * .7)))
-}
-function endPageDrag(event: PointerEvent) {
-  if (event.pointerId !== turnPointer) return
-  const travel = (turnStartX - event.clientX) * turnDirection.value
-  const velocity = travel / Math.max(1, performance.now() - turnStartTime)
-  turnPointer = null
-  turnAuto.value = Math.abs(travel) < 5
-  finishTurn(Math.abs(travel) < 5 || turnProgress.value > .28 || velocity > .45)
-}
-function cancelPageDrag(event: PointerEvent) {
-  if (event.pointerId !== turnPointer) return
-  turnPointer = null
-  finishTurn(false)
-}
 const site = ref<HTMLElement | null>(null)
 let motion: ReturnType<typeof createPortfolioMotion> | undefined
 function updateRoute() { hash.value = location.hash || '#/'; scrollTo(0, 0) }
@@ -161,7 +77,6 @@ onUnmounted(() => {
   removeEventListener('hashchange', updateRoute)
   removeEventListener('keydown', closeMenuOnEscape)
   motion?.destroy()
-  clearTimeout(turnTimer)
 })
 </script>
 
@@ -179,33 +94,7 @@ onUnmounted(() => {
 
       <section class="section wrap tasks-section" aria-labelledby="tasks-heading">
         <h2 id="tasks-heading">С какими задачами<br />ко мне обращаются</h2>
-        <div class="task-album">
-          <div class="album-binding" aria-hidden="true"><span v-for="i in 5" :key="i"></span></div>
-          <div class="album-body">
-            <div class="album-top"><span>Задачи и решения</span><span>{{ String(taskPage + 1).padStart(2, '0') }} / 04</span></div>
-            <div class="album-page-area" aria-live="polite" aria-atomic="true">
-              <article v-if="turnTarget !== null" class="album-page album-underpage" aria-hidden="true">
-                <span class="album-number">{{ String(turnTarget + 1).padStart(2, '0') }}.</span>
-                <h3>{{ tasks[turnTarget]?.[0] }}</h3>
-                <p>{{ tasks[turnTarget]?.[1] }}</p>
-              </article>
-              <div class="album-turn-sheet" :class="{ 'is-settling': turnSettling, 'is-reverse': turnDirection === -1, 'is-auto-turn': turnAuto }" :style="turnStyle" @transitionend="onTurnTransitionEnd">
-                <article class="album-page album-frontpage">
-                  <span class="album-number">{{ String(taskPage + 1).padStart(2, '0') }}.</span>
-                  <h3>{{ tasks[taskPage]?.[0] }}</h3>
-                  <p>{{ tasks[taskPage]?.[1] }}</p>
-                </article>
-              </div>
-              <span v-if="turnTarget !== null" class="album-page-curl" :class="{ 'is-reverse': turnDirection === -1, 'is-settling': turnSettling, 'is-auto-turn': turnAuto }" :style="curlStyle" aria-hidden="true"></span>
-              <button v-if="taskPage > 0" type="button" class="album-edge album-edge-prev" aria-label="Потянуть край: предыдущая страница" @pointerdown="startPageDrag($event, -1)" @pointermove="movePageDrag" @pointerup="endPageDrag" @pointercancel="cancelPageDrag" @click="($event as MouseEvent).detail === 0 && goToTaskPage(taskPage - 1)"><span aria-hidden="true"></span></button>
-              <button v-if="taskPage < tasks.length - 1" type="button" class="album-edge album-edge-next" aria-label="Потянуть край: следующая страница" @pointerdown="startPageDrag($event, 1)" @pointermove="movePageDrag" @pointerup="endPageDrag" @pointercancel="cancelPageDrag" @click="($event as MouseEvent).detail === 0 && goToTaskPage(taskPage + 1)"><span aria-hidden="true"></span></button>
-            </div>
-            <div class="album-controls" aria-label="Страницы альбома">
-              <span class="album-hint">Потяните за край страницы</span>
-              <div class="album-tabs"><button v-for="(item, i) in tasks" :key="item[0]" type="button" :aria-label="`Страница ${i + 1}: ${item[0]}`" :aria-pressed="taskPage === i" @click="goToTaskPage(i)">0{{ i + 1 }}</button></div>
-            </div>
-          </div>
-        </div>
+        <TaskNotebook :tasks="tasks" />
       </section>
 
       <section class="section pale float-section"><svg class="float-mark star float-mark-left sparkle-icon" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2 59 38 92 15 69 48 98 56 65 62 84 94 56 70 45 99 41 66 7 82 31 55 1 43 35 41 25 8 48 34Z" /></svg><div class="wrap"><h2 class="script-heading services-heading">Услуги</h2><h2>От исследования<br />до реализации</h2><p class="section-lead">Подбираю маркетинговые решения под задачи бизнеса. Можно начать с отдельной стратегии или выстроить комплексное продвижение.</p><div class="services"><article v-for="(item,i) in services" :key="item.title"><button type="button" :aria-expanded="expanded === i" @click="expanded = expanded === i ? null : i"><span>0{{ i+1 }}</span><strong>{{ item.title }}</strong><small>{{ item.need }}<br />Результат: {{ item.result }}</small><b>{{ expanded === i ? '−' : '+' }}</b></button><div v-if="expanded === i" class="service-open"><p>{{ item.scope }}</p><a href="#/contact">Обсудить услугу</a></div></article></div><a class="text-link" href="#/services">Все услуги и форматы работы</a></div></section>

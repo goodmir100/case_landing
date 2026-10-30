@@ -613,83 +613,10 @@ body { background: var(--paper); }
 .hero-collage:before { background: var(--red-raw); }
 button, .button, .header-link, .hero .actions .button, .design-teaser .button.dark { border-radius: 0; }
 .button-symbol { border-radius: 0; }
-/* Task album */
 .tasks-section > h2 { max-width: 900px; margin-bottom: 48px; }
-.task-album { display: flex; position: relative; background: #f1e8db; border: 1px solid #a99c8d; box-shadow: 8px 8px 0 #d8cbb9, 9px 9px 0 #a99c8d; }
-.album-binding { flex: 0 0 72px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding-block: 26px; border-right: 1px solid #c9bcac; background: #e7dbcb; }
-.album-binding span { width: 43px; height: 11px; border: 3px solid #665e56; border-radius: 10px; background: #f7f1e7; box-shadow: 1px 2px 0 #aaa092; }
-.album-body { flex: 1; min-width: 0; padding: 32px clamp(28px, 5vw, 70px) 28px; background: #fffdf8; }
-.album-top { display: flex; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid #d5c9b9; color: #6e6258; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.album-page-area { min-height: 290px; display: flex; align-items: center; perspective: 1200px; }
-.album-page { width: 100%; padding: 36px 0; transform-origin: left center; backface-visibility: hidden; }
-.album-number { color: var(--red-raw); font-size: 16px; font-weight: 800; }
-.album-page h3 { max-width: 850px; margin: 18px 0; font-size: clamp(28px, 3.6vw, 50px); line-height: 1.08; letter-spacing: -.05em; text-transform: uppercase; }
-.album-page p { max-width: 690px; margin: 0; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.65; color: #514942; }
-.page-turn-enter-active, .page-turn-leave-active { transition: opacity 180ms var(--motion-ease-out), transform 180ms var(--motion-ease-out); }
-.page-turn-enter-from, .page-turn-leave-to { opacity: 0; transform: rotateY(-12deg) translateX(-12px); }
-.album-controls { display: flex; align-items: center; gap: 12px; border-top: 1px solid #d5c9b9; padding-top: 20px; }
-.album-tabs { display: flex; flex: 1; justify-content: center; gap: 8px; }
-.album-controls button { min-width: 44px; min-height: 44px; border: 1px solid #b5a99b; background: transparent; color: var(--ink); font-weight: 800; }
-.album-tabs button[aria-pressed="true"] { background: var(--red-raw); border-color: var(--red-raw); color: #fff; }
-.album-controls button:disabled { opacity: .35; cursor: default; }
 @media (max-width: 760px) {
   .tasks-section { padding-block: 72px; }
   .tasks-section > h2 { margin-bottom: 32px; }
-  .album-binding { flex-basis: 36px; }
-  .album-binding span { width: 26px; height: 9px; border-width: 2px; }
-  .album-body { padding: 22px 18px; }
-  .album-page-area { min-height: 330px; }
-  .album-page h3 { font-size: clamp(26px, 7vw, 38px); }
-  .album-controls { gap: 4px; }
-  .album-tabs { gap: 3px; }
-  .album-controls button { min-width: 38px; min-height: 44px; }
-}
-
-/* A page follows the pointer, then settles into the next sheet. */
-.album-page-area { position: relative; display: block; min-height: 360px; overflow: hidden; perspective: 1400px; background: #f8f2e8; }
-.album-turn-sheet { position: relative; z-index: 2; width: 100%; min-height: 360px; background: #fffdf8; will-change: clip-path; }
-.album-turn-sheet.is-settling { transition: clip-path 760ms var(--motion-ease-in-out); }
-.album-frontpage { min-height: 360px; padding: 40px 24px; backface-visibility: hidden; }
-.album-frontpage { position: relative; z-index: 1; background: linear-gradient(90deg, #f4ece0, #fffdf8 7%, #fffdf8 93%, #eee3d3); }
-.album-page-curl { position: absolute; z-index: 3; top: 0; bottom: 0; width: 52px; transform-origin: center center; background: linear-gradient(90deg, #cdbba4, #efe3d2 17%, #fffdf9 46%, #e5d1b9 78%, #bca58a); clip-path: polygon(0 0, 100% 3%, 84% 50%, 100% 97%, 0 100%, 16% 50%); box-shadow: 8px 0 18px rgba(57, 43, 28, .22); pointer-events: none; }
-.album-page-curl.is-reverse { background: linear-gradient(270deg, #cdbba4, #efe3d2 17%, #fffdf9 46%, #e5d1b9 78%, #bca58a); box-shadow: -8px 0 18px rgba(57, 43, 28, .22); }
-.album-page-curl.is-settling { transition: left 760ms var(--motion-ease-in-out), transform 760ms var(--motion-ease-in-out), opacity 760ms var(--motion-ease-in-out); }
-.album-page-curl.is-auto-turn.is-settling { animation: album-curl-forward 760ms var(--motion-ease-in-out) both; }
-.album-page-curl.is-auto-turn.is-settling.is-reverse { animation-name: album-curl-backward; }
-@keyframes album-curl-forward {
-  0%, 100% { opacity: 0; transform: perspective(320px) rotateY(0deg) skewY(0deg); }
-  50% { opacity: 1; transform: perspective(320px) rotateY(-52deg) skewY(4deg); }
-}
-@keyframes album-curl-backward {
-  0%, 100% { opacity: 0; transform: perspective(320px) rotateY(0deg) skewY(0deg); }
-  50% { opacity: 1; transform: perspective(320px) rotateY(52deg) skewY(-4deg); }
-}
-.album-underpage { position: absolute; inset: 0; z-index: 1; padding: 40px 24px; background: linear-gradient(90deg, #f4ece0, #fffdf8 7%, #fffdf8 93%, #eee3d3); }
-.album-edge { position: absolute; z-index: 4; top: 0; bottom: 0; width: 54px; border: 0; background: transparent; color: #8e7767; cursor: grab; touch-action: none; }
-.album-edge:active { cursor: grabbing; }
-.album-edge-prev { left: 0; }
-.album-edge-next { right: 0; }
-.album-edge span { position: absolute; top: 50%; left: 50%; display: grid; place-items: center; width: 32px; height: 68px; transform: translate(-50%, -50%); border: 1px solid #c9b9a5; background: #f6ede0; font: 36px/1 Georgia, serif; box-shadow: 2px 3px 0 #d7c7b4; }
-.album-edge-next span { box-shadow: -2px 3px 0 #d7c7b4; }
-.album-edge:focus-visible { outline: 3px solid var(--red-raw); outline-offset: -5px; }
-.album-controls { justify-content: space-between; }
-.album-hint { font-size: 12px; color: #6e6258; }
-.album-tabs { flex: 0 0 auto; }
-@media (max-width: 760px) {
-  .album-page-area, .album-turn-sheet, .album-frontpage { min-height: 420px; }
-  .album-edge { width: 38px; }
-  .album-frontpage, .album-underpage { padding: 40px 34px; }
-  .album-hint { font-size: 11px; max-width: 110px; }
-}
-
-/* Folded page corners replace the old arrow glyphs. */
-.album-frontpage, .album-underpage { padding-inline: 66px; }
-.album-edge span { top: 0; left: auto; right: 0; width: 44px; height: 44px; transform: none; border: 0; background: linear-gradient(135deg, #e8dac7 49%, #c7b49e 50%, #f7eee0 53%); box-shadow: -3px 4px 6px rgba(57, 43, 28, .15); }
-.album-edge-prev span { left: 0; right: auto; transform: scaleX(-1); }
-.album-edge-next span { box-shadow: -3px 4px 6px rgba(57, 43, 28, .15); }
-@media (max-width: 760px) {
-  .album-frontpage, .album-underpage { padding-inline: 42px; }
-  .album-edge span { width: 32px; height: 32px; }
 }
 
 .collage-sticker { min-width: 175px; padding: 18px 20px; text-align: center; white-space: nowrap; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 900; line-height: 1.1; letter-spacing: .025em; transform: rotate(3deg); }
