@@ -1,9 +1,9 @@
 const revealSelector = [
-  '.section h2', '.section .eyebrow', '.metrics a', '.task-grid article',
+  '.section .eyebrow', '.metrics a', '.task-grid article',
   '.services article', '.case-card', '.approach li', '.process article',
   '.design-types article', '.formats article', '.about-art', '.faq details',
-  '.inner h1', '.inner .gallery article', '.inner .story article',
-  '.inner .service-page article', '.contact-section h2', '.contact-section .script',
+  '.inner .gallery article', '.inner .story article',
+  '.inner .service-page article', '.contact-section .script',
   '.contact-section form', '.hero-scribble', '.design-doodle',
 ].join(', ')
 
